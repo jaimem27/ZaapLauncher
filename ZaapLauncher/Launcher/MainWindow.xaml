@@ -1,0 +1,204 @@
+﻿<Window x:Class="ZaapLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="ZaapLauncher" Width="920" Height="540"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#0B1220">
+
+    <Window.Resources>
+
+        <!-- Brushes -->
+        <SolidColorBrush x:Key="BrushBg" Color="#0B1220"/>
+        <SolidColorBrush x:Key="BrushPanel" Color="#111B2E"/>
+        <SolidColorBrush x:Key="BrushText" Color="#D7E3FF"/>
+        <SolidColorBrush x:Key="BrushTextSoft" Color="#90A4C3"/>
+        <SolidColorBrush x:Key="BrushAccent" Color="#38BDF8"/>
+        <SolidColorBrush x:Key="BrushAccent2" Color="#3B82F6"/>
+
+        <!-- Simple glow effect -->
+        <DropShadowEffect x:Key="GlowSoft" Color="#38BDF8" BlurRadius="30" ShadowDepth="0" Opacity="0.35"/>
+
+        <!-- Rotate storyboard for Zaap rune -->
+        <Storyboard x:Key="RuneRotate">
+            <DoubleAnimation Storyboard.TargetName="RuneRotateTransform"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360"
+                             Duration="0:0:24" RepeatBehavior="Forever"/>
+        </Storyboard>
+
+        <!-- Pulse storyboard for Ready -->
+        <Storyboard x:Key="RunePulse">
+            <DoubleAnimation Storyboard.TargetName="RuneImage"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.75" To="1.0"
+                             Duration="0:0:1.4" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
+
+    </Window.Resources>
+
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource BrushPanel}" CornerRadius="18" Padding="18" Opacity="0.98">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="ZaapLauncher"
+                               Foreground="{StaticResource BrushText}"
+                               FontSize="28" FontWeight="SemiBold"/>
+                    <TextBlock Text="Channeling the World of Twelve"
+                               Foreground="{StaticResource BrushTextSoft}"
+                               FontSize="12" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <!-- Server status pill -->
+                <Border Grid.Column="1" CornerRadius="999" Padding="10,6"
+                        Background="#0E1A2F" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="9" Height="9" Margin="0,0,8,0"
+                                 Fill="{Binding ServerStatusColor}"/>
+                        <TextBlock Text="{Binding ServerStatusText}"
+                                   Foreground="{StaticResource BrushText}"
+                                   FontSize="12"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Center -->
+        <Grid Grid.Row="1" Margin="0,18,0,18">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: changelog / featured -->
+            <Border Background="{StaticResource BrushPanel}" CornerRadius="18" Padding="16" Opacity="0.98">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="News"
+                               Foreground="{StaticResource BrushText}"
+                               FontSize="14" FontWeight="SemiBold"/>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,12,0,0">
+                        <TextBlock Text="{Binding ChangelogText}"
+                                   Foreground="{StaticResource BrushTextSoft}"
+                                   FontSize="12" TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Right: Zaap core -->
+            <Border Grid.Column="1" Background="{StaticResource BrushPanel}" CornerRadius="18" Padding="16" Opacity="0.98">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Rune -->
+                        <Image x:Name="RuneImage"
+                               Width="320" Height="320"
+                               Source="{Binding RuneImageSource}"
+                               Opacity="0.9"
+                               RenderTransformOrigin="0.5,0.5"
+                               Effect="{StaticResource GlowSoft}">
+                            <Image.RenderTransform>
+                                <RotateTransform x:Name="RuneRotateTransform" Angle="0"/>
+                            </Image.RenderTransform>
+                        </Image>
+
+                        <!-- Inner circle -->
+                        <Ellipse Width="210" Height="210" Fill="#0C162A" Opacity="0.95"/>
+
+                        <!-- Play button -->
+                        <Button Width="190" Height="56"
+                                Command="{Binding PlayCommand}"
+                                IsEnabled="{Binding IsPlayEnabled}"
+                                Background="{StaticResource BrushAccent2}"
+                                Foreground="White"
+                                FontSize="18" FontWeight="SemiBold"
+                                Cursor="Hand">
+                            <Button.Effect>
+                                <DropShadowEffect Color="#38BDF8" BlurRadius="35" ShadowDepth="0" Opacity="0.55"/>
+                            </Button.Effect>
+                            <TextBlock Text="PLAY" HorizontalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+
+                    <!-- Status text -->
+                    <StackPanel Grid.Row="1" Margin="0,10,0,0" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding StatusTitle}"
+                                   Foreground="{StaticResource BrushText}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding StatusSubtitle}"
+                                   Foreground="{StaticResource BrushTextSoft}"
+                                   FontSize="12" Margin="0,4,0,0"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="{StaticResource BrushPanel}" CornerRadius="18" Padding="16" Opacity="0.98">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <ProgressBar Height="10" Minimum="0" Maximum="1"
+                                 Value="{Binding Progress01}"
+                                 Background="#0E1A2F"
+                                 Foreground="{StaticResource BrushAccent}"/>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Text="{Binding ProgressText}"
+                                   Foreground="{StaticResource BrushTextSoft}"
+                                   FontSize="12"/>
+                        <TextBlock DockPanel.Dock="Right"
+                                   Text="{Binding VersionText}"
+                                   Foreground="{StaticResource BrushTextSoft}"
+                                   FontSize="12"/>
+                    </DockPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Repair"
+                            Command="{Binding RepairCommand}"
+                            IsEnabled="{Binding IsRepairEnabled}"
+                            Margin="0,0,10,0"
+                            Padding="18,8"
+                            Background="#0E1A2F"
+                            Foreground="{StaticResource BrushText}"
+                            Cursor="Hand"/>
+
+                    <Button Content="Logs"
+                            Command="{Binding ToggleLogsCommand}"
+                            Padding="18,8"
+                            Background="#0E1A2F"
+                            Foreground="{StaticResource BrushText}"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
