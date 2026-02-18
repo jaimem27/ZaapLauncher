@@ -8,4 +8,18 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\portal.jpg" />
+    <None Remove="Assets\vortex.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZaapLauncher.Core\ZaapLauncher.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\portal.jpg" />
+    <Resource Include="Assets\vortex.png" />
+  </ItemGroup>
+
 </Project>
