@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "id": "2026-02-19-launch",
+      "date": "2026-02-19",
+      "title": "ZaapLauncher online",
+      "tag": "Update",
+      "body": "Nuevo launcher con portal animado, noticias y mejoras de estabilidad.",
+      "image": "/Assets/news/images/launch.jpg",
+      "link": "https://fonts.google.com/?preview.text=ZaapLauncher"
+    },
+    {
+      "id": "2026-02-21-x2exp",
+      "date": "2026-02-21",
+      "title": "Fin de semana x2 EXP",
+      "tag": "Evento",
+      "body": "Del viernes al domingo, EXP duplicada en todas las zonas.",
+      "image": "/Assets/news/images/x2exp.jpg"
+    }
+  ]
+}

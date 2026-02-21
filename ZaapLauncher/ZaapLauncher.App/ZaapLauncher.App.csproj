@@ -9,8 +9,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icon.jpg" />
+    <None Remove="Assets\icon.png" />
+    <None Remove="Assets\icons\close.png" />
+    <None Remove="Assets\icons\discord.png" />
+    <None Remove="Assets\icons\minimize.png" />
+    <None Remove="Assets\logo.png" />
+    <None Remove="Assets\news\images\launch.jpg" />
+    <None Remove="Assets\news\images\x2exp.jpg" />
+    <None Remove="Assets\news\news.json" />
     <None Remove="Assets\portal.jpg" />
     <None Remove="Assets\vortex.png" />
+    <None Remove="Fonts\Exo2-Bold.ttf" />
+    <None Remove="Fonts\Exo2-Regular.ttf" />
+    <None Remove="Fonts\Exo2-SemiBold.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icons\close.png" />
+    <Resource Include="Assets\icons\discord.png" />
+    <Resource Include="Assets\icons\minimize.png" />
+    <Resource Include="Assets\news\images\launch.jpg" />
+    <Resource Include="Assets\news\images\x2exp.jpg" />
+    <Content Include="Assets\news\news.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Fonts\Exo2-Regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,8 +42,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\icon.png" />
+    <Resource Include="Assets\logo.png" />
     <Resource Include="Assets\portal.jpg" />
     <Resource Include="Assets\vortex.png" />
+    <Resource Include="Fonts\Exo2-Bold.ttf" />
+    <Resource Include="Fonts\Exo2-SemiBold.ttf" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,13 @@
         WindowStartupLocation="CenterScreen"
         Background="#0B1220"
         WindowStyle="None"
-        AllowsTransparency="False">
+        AllowsTransparency="False"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        TextOptions.TextHintingMode="Fixed"
+        RenderOptions.BitmapScalingMode="HighQuality">
 
     <Window.Resources>
 
@@ -17,7 +23,7 @@
             <DoubleAnimation Storyboard.TargetName="PortalBaseImage"
                              Storyboard.TargetProperty="Opacity"
                              From="0.90" To="0.98"
-                             Duration="0:0:3.5"/>
+                             Duration="0:0:3.5" />
         </Storyboard>
 
         <!-- Vortex rotate (brush) -->
@@ -25,23 +31,132 @@
             <DoubleAnimation Storyboard.TargetName="VortexBrush"
                              Storyboard.TargetProperty="(Brush.RelativeTransform).(RotateTransform.Angle)"
                              From="0" To="360"
-                             Duration="0:0:10"/>
+                             Duration="0:0:10" />
         </Storyboard>
+
+        <!-- Header typography -->
+        <Style x:Key="HeaderTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="/Fonts/#Exo 2" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Foreground" Value="#F3F8FF" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+        </Style>
+
+        <Style x:Key="HeaderSubtitleStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#8FB0D6" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+            <Setter Property="Opacity" Value="0.95" />
+        </Style>
+
+        <!-- Chip text -->
+        <Style x:Key="HeaderChipText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#BFD6FF" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        </Style>
+
+        <!-- Header icon buttons -->
+        <Style x:Key="HeaderIconButton" TargetType="Button">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Background" Value="#0E1A2F" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                CornerRadius="12"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#162747" />
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#0B1430" />
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Header close button (red hover) -->
+        <Style x:Key="HeaderCloseButton" TargetType="Button" BasedOn="{StaticResource HeaderIconButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                CornerRadius="12"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#3A1B24" />
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#2A1119" />
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- PLAY button style -->
         <Style x:Key="PlayButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="210"/>
-            <Setter Property="Height" Value="60"/>
-            <Setter Property="Background" Value="#3B82F6"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Width" Value="210" />
+            <Setter Property="Height" Value="60" />
+            <Setter Property="Background" Value="#3B82F6" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
             <Setter Property="RenderTransform">
                 <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                    <ScaleTransform ScaleX="1" ScaleY="1" />
                 </Setter.Value>
             </Setter>
 
@@ -50,72 +165,71 @@
                     <ControlTemplate TargetType="Button">
                         <Grid>
 
-                            <!-- Glow externo -->
+                            <!-- Outer glow -->
                             <Border x:Name="Glow"
-                            CornerRadius="20"
-                            Opacity="0">
+                                    CornerRadius="20"
+                                    Opacity="0">
                                 <Border.Effect>
                                     <DropShadowEffect Color="#38BDF8"
-                                              BlurRadius="50"
-                                              ShadowDepth="0"
-                                              Opacity="0.9"/>
+                                                      BlurRadius="50"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.9" />
                                 </Border.Effect>
                             </Border>
 
                             <!-- Root -->
                             <Border x:Name="Root"
-                            CornerRadius="20"
-                            Background="{TemplateBinding Background}"
-                            BorderThickness="1"
-                            BorderBrush="#00000000"
-                            SnapsToDevicePixels="True">
+                                    CornerRadius="20"
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="1"
+                                    BorderBrush="#00000000"
+                                    SnapsToDevicePixels="True">
 
-                                <!-- Recorte real -->
                                 <Grid ClipToBounds="True">
 
-                                    <!-- ✅ Brillo superior (recortado) -->
+                                    <!-- Top sheen -->
                                     <Border CornerRadius="20"
-                                    Opacity="0.16">
+                                            Opacity="0.16">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="#FFFFFFFF" Offset="0"/>
-                                                <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                                <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                                <GradientStop Color="#00FFFFFF" Offset="1" />
                                             </LinearGradientBrush>
                                         </Border.Background>
                                     </Border>
 
-                                    <!-- ✅ Highlight diagonal tipo cristal -->
+                                    <!-- Diagonal highlight -->
                                     <Rectangle Opacity="0.10" Margin="-40,-10,0,0">
                                         <Rectangle.Fill>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                <GradientStop Color="#40FFFFFF" Offset="0"/>
-                                                <GradientStop Color="#00FFFFFF" Offset="0.55"/>
-                                                <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                                <GradientStop Color="#40FFFFFF" Offset="0" />
+                                                <GradientStop Color="#00FFFFFF" Offset="0.55" />
+                                                <GradientStop Color="#00FFFFFF" Offset="1" />
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
                                         <Rectangle.RenderTransform>
-                                            <RotateTransform Angle="-12" CenterX="0.5" CenterY="0.5"/>
+                                            <RotateTransform Angle="-12" CenterX="0.5" CenterY="0.5" />
                                         </Rectangle.RenderTransform>
                                     </Rectangle>
 
-                                    <!-- ✅ Borde interno sutil (glass edge) -->
+                                    <!-- Inner edge -->
                                     <Border CornerRadius="18"
-                                    Margin="2"
-                                    BorderThickness="1"
-                                    BorderBrush="#26FFFFFF"
-                                    IsHitTestVisible="False"/>
+                                            Margin="2"
+                                            BorderThickness="1"
+                                            BorderBrush="#26FFFFFF"
+                                            IsHitTestVisible="False" />
 
-                                    <!-- Texto -->
+                                    <!-- Content -->
                                     <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                                      VerticalAlignment="Center" />
                                 </Grid>
 
-                                <!-- Sombra base -->
+                                <!-- Base shadow -->
                                 <Border.Effect>
                                     <DropShadowEffect Color="#000000"
-                                              BlurRadius="20"
-                                              ShadowDepth="6"
-                                              Opacity="0.35"/>
+                                                      BlurRadius="20"
+                                                      ShadowDepth="6"
+                                                      Opacity="0.35" />
                                 </Border.Effect>
                             </Border>
                         </Grid>
@@ -124,11 +238,11 @@
 
                             <!-- Hover -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Glow" Property="Opacity" Value="1"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#80BDF8FF"/>
+                                <Setter TargetName="Glow" Property="Opacity" Value="1" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#80BDF8FF" />
                                 <Setter Property="RenderTransform">
                                     <Setter.Value>
-                                        <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                                        <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -137,13 +251,122 @@
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter Property="RenderTransform">
                                     <Setter.Value>
-                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
                                     </Setter.Value>
                                 </Setter>
-                                <Setter TargetName="Glow" Property="Opacity" Value="0.6"/>
+                                <Setter TargetName="Glow" Property="Opacity" Value="0.6" />
                             </Trigger>
 
                             <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.55" />
+                            </Trigger>
+
+                            <!-- Ready: glow activo -->
+                            <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                <Setter TargetName="Glow" Property="Opacity" Value="1" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#80BDF8FF" />
+                            </DataTrigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo PLAY: opacidad según IsReadyToPlay (sin tocar tamaños) -->
+        <Style x:Key="PlayButtonStyleReady" TargetType="Button" BasedOn="{StaticResource PlayButtonStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="False">
+                    <Setter Property="Opacity" Value="0.75"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Barra de progreso fina tipo píldora (sin converters) + sheen animado -->
+        <Style x:Key="ProgressPillStyle" TargetType="ProgressBar">
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="Background" Value="#0B162B"/>
+            <Setter Property="Foreground" Value="#2AA8FF"/>
+            <Setter Property="BorderBrush" Value="#132443"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid x:Name="Root" ClipToBounds="True" SnapsToDevicePixels="True">
+
+                            <!-- Track -->
+                            <Border x:Name="Track"
+                                    CornerRadius="999"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                            <!-- Indicador -->
+                            <Border x:Name="PART_Indicator"
+                                    CornerRadius="999"
+                                    Background="{TemplateBinding Foreground}"
+                                    Margin="1"
+                                    HorizontalAlignment="Left">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#38BDF8"
+                                                      BlurRadius="14"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.22"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Sheen -->
+                            <Rectangle x:Name="Sheen"
+                                       IsHitTestVisible="False"
+                                       Opacity="0.22"
+                                       RadiusX="999"
+                                       RadiusY="999"
+                                       Margin="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#00FFFFFF" Offset="0"/>
+                                        <GradientStop Color="#80FFFFFF" Offset="0.5"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                                <Rectangle.RenderTransform>
+                                    <TranslateTransform x:Name="SheenTransform" X="-220"/>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+
+                            <!-- Inner border -->
+                            <Border CornerRadius="999"
+                                    Margin="1"
+                                    BorderThickness="1"
+                                    BorderBrush="#1AFFFFFF"
+                                    Opacity="0.25"
+                                    IsHitTestVisible="False"/>
+
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+
+                            <!-- Animación sheen -->
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="SheenTransform"
+                                                         Storyboard.TargetProperty="X"
+                                                         From="-220" To="520"
+                                                         Duration="0:0:1.9"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+
+                            <Trigger Property="IsIndeterminate" Value="True">
+                                <Setter TargetName="Sheen" Property="Opacity" Value="0.32"/>
+                            </Trigger>
+
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
                             </Trigger>
@@ -154,6 +377,96 @@
             </Setter>
         </Style>
 
+        <!-- NEWS styles -->
+        <Style x:Key="NewsHeaderTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#D7E3FF" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        </Style>
+
+        <Style x:Key="NewsCardTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#EAF2FF" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        </Style>
+
+        <Style x:Key="NewsCardMeta" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#7FA0C9" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        </Style>
+
+        <Style x:Key="NewsCardBody" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#90A4C3" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        </Style>
+
+        <!-- ScrollBar theme -->
+        <Style x:Key="NewsScrollBarThumb" TargetType="Thumb">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Background="#1B2C4E" CornerRadius="999" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NewsScrollBarStyle" TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Background" Value="#00000000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Margin="2,0,2,0">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource NewsScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PART_Track" Property="Opacity" Value="0.95"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter TargetName="PART_Track" Property="Opacity" Value="0.75"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NewsScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ScrollContentPresenter Grid.Column="0" />
+
+                            <ScrollBar Grid.Column="1"
+                                       Orientation="Vertical"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Style="{StaticResource NewsScrollBarStyle}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </Window.Resources>
 
@@ -173,100 +486,288 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <Grid Grid.Row="0"
-                  Background="#111B2E"
-                  MouseLeftButtonDown="Header_MouseLeftButtonDown">
+            <!-- Header container (rounded) -->
+            <Border Grid.Row="0"
+                    CornerRadius="16,16,0,0"
+                    ClipToBounds="True"
+                    Background="#111B2E"
+                    MouseLeftButtonDown="Header_MouseLeftButtonDown">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                <Grid Height="56" SnapsToDevicePixels="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Vertical" Margin="18,10,0,0">
-                    <TextBlock Text="ZaapLauncher"
-                               Foreground="#D7E3FF"
-                               FontSize="18"
-                               FontWeight="SemiBold" />
-                    <TextBlock Text="Conectando con el Mundo de los doce"
-                               Foreground="#90A4C3"
-                               FontSize="11"
-                               Margin="0,2,0,0" />
-                </StackPanel>
-
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            Margin="0,0,14,0">
-
-                    <Border Background="#0E1A2F"
-                            CornerRadius="999"
-                            Padding="10,6"
-                            Margin="0,0,10,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Margin="0,0,8,0"
-                                     Fill="{Binding ServerStatusColor}" />
-                            <TextBlock Text="{Binding ServerStatusText}"
-                                       Foreground="#D7E3FF"
-                                       FontSize="12" />
-                        </StackPanel>
+                    <!-- Bottom subtle line -->
+                    <Border VerticalAlignment="Bottom" Height="1" Opacity="0.55" IsHitTestVisible="False">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#001C2E50" Offset="0" />
+                                <GradientStop Color="#402AA8FF" Offset="0.5" />
+                                <GradientStop Color="#001C2E50" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
                     </Border>
 
-                    <Button Width="40"
-                            Height="32"
-                            Background="#0E1A2F"
-                            Foreground="#D7E3FF"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            ToolTip="Join Discord"
-                            Click="Discord_Click"
-                            Margin="0,0,10,0">
-                        <TextBlock Text="⌁"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                    </Button>
+                    <!-- Left: icon + title -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,8,0,0">
 
-                    <Button Content="✕"
-                            Width="44"
-                            Height="32"
-                            Background="#0E1A2F"
-                            Foreground="#D7E3FF"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Click="Close_Click" />
-                </StackPanel>
-            </Grid>
+                        <Grid Width="42" Height="42" Margin="0,0,12,0">
+                            <Ellipse Fill="#0E1A2F" />
+                            <Ellipse Opacity="0.45">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="#38BDF8"
+                                                      BlurRadius="18"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.35"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
+
+                            <Image Source="/Assets/icon.png"
+                                   Width="78"
+                                   Height="54"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Top"
+                                   Margin="0,-3,0,0" />
+                        </Grid>
+
+                        <StackPanel Orientation="Vertical" Margin="0,2,0,0">
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Style="{StaticResource HeaderTitleStyle}">
+                                    <Run Text="Zaap" Foreground="#8FD3FF" />
+                                    <Run Text=" Launcher" />
+                                </TextBlock>
+
+                                <!-- Version chip (outline) -->
+                                <Border CornerRadius="999"
+                                        Padding="8,3"
+                                        Margin="10,2,0,0"
+                                        Background="#00000000"
+                                        BorderBrush="#1F2E52"
+                                        BorderThickness="1"
+                                        Opacity="0.9">
+                                    <TextBlock Text="{Binding LauncherVersion}"
+                                               Foreground="#BFD6FF"
+                                               FontSize="10.5"
+                                               FontWeight="SemiBold"
+                                               FontFamily="Segoe UI Variable" />
+                                </Border>
+                            </StackPanel>
+
+                            <TextBlock Text="Abriendo el portal al Mundo de los Doce…"
+                                       Style="{StaticResource HeaderSubtitleStyle}"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Right: status + buttons -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,14,0">
+
+                        <!-- Status pill -->
+                        <Border CornerRadius="999"
+                                Padding="12,7"
+                                Margin="0,0,8,0"
+                                BorderThickness="1"
+                                BorderBrush="#1F2E52">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#0F1C34" Offset="0" />
+                                    <GradientStop Color="#0B162B" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" Margin="0,0,8,0" Fill="{Binding ServerStatusColor}" />
+                                <TextBlock Text="{Binding ServerStatusText}"
+                                           Foreground="#D7E3FF"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           FontFamily="Segoe UI Variable" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Vertical separator -->
+                        <Border Width="1"
+                                Height="20"
+                                Background="#1F2E52"
+                                Opacity="0.33"
+                                Margin="0,0,10,0" />
+
+                        <!-- Discord -->
+                        <Button Style="{StaticResource HeaderIconButton}"
+                                ToolTip="Únete a Discord"
+                                Click="Discord_Click"
+                                Margin="0,0,8,0">
+                            <Image Source="/Assets/Icons/discord.png"
+                                   Width="22" Height="22"
+                                   Stretch="Uniform"
+                                   SnapsToDevicePixels="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Button>
+
+                        <!-- Minimize -->
+                        <Button Style="{StaticResource HeaderIconButton}"
+                                ToolTip="Minimizar"
+                                Click="Minimize_Click"
+                                Margin="0,0,8,0">
+                            <Image Source="/Assets/Icons/minimize.png"
+                                   Width="18" Height="18"
+                                   Stretch="Uniform"
+                                   SnapsToDevicePixels="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Button>
+
+                        <!-- Close -->
+                        <Button Style="{StaticResource HeaderCloseButton}"
+                                ToolTip="Cerrar"
+                                Click="Close_Click">
+                            <Image Source="/Assets/Icons/close.png"
+                                   Width="18" Height="18"
+                                   Stretch="Uniform"
+                                   SnapsToDevicePixels="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Button>
+
+                    </StackPanel>
+
+                </Grid>
+            </Border>
 
             <!-- Body -->
-            <Grid Grid.Row="1" Margin="18">
+            <Grid Grid.Row="1" Margin="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="340" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Left -->
+                <!-- Left: News -->
                 <Border Background="#0E1A2F"
                         CornerRadius="16"
-                        Padding="16"
-                        Opacity="0.95">
+                        Padding="20,18,20,20"
+                        Opacity="0.95" Margin="-16,0,0,0">
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="News"
-                                   Foreground="#D7E3FF"
-                                   FontSize="13"
-                                   FontWeight="SemiBold" />
+                        <TextBlock Text="Noticias" Style="{StaticResource NewsHeaderTitle}" />
 
-                        <ScrollViewer Grid.Row="1" Margin="0,12,0,0">
-                            <TextBlock Text="{Binding NewsText}"
-                                       Foreground="#90A4C3"
-                                       FontSize="12"
-                                       TextWrapping="Wrap" />
+                        <ScrollViewer Grid.Row="1"
+                                      Margin="0,12,0,0"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Style="{StaticResource NewsScrollViewerStyle}">
+
+                            <ItemsControl ItemsSource="{Binding NewsItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#0B162B"
+                                                CornerRadius="12"
+                                                Padding="12"
+                                                Margin="0,0,0,14"
+                                                BorderThickness="1"
+                                                BorderBrush="#132443">
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="72" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Image -->
+                                                <Border Grid.Column="0"
+                                                        Width="64"
+                                                        Height="64"
+                                                        CornerRadius="12"
+                                                        Background="#0E1A2F"
+                                                        BorderThickness="1"
+                                                        BorderBrush="#132443"
+                                                        SnapsToDevicePixels="True"
+                                                        VerticalAlignment="Top">
+                                                    <Grid ClipToBounds="True">
+                                                        <Image Source="{Binding ImageSource}"
+                                                               Stretch="UniformToFill"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                                               SnapsToDevicePixels="True" />
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Content -->
+                                                <Grid Grid.Column="1">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- Title + tag -->
+                                                    <Grid Grid.Row="0" Margin="0,0,0,2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="{Binding Title}"
+                                                                   Style="{StaticResource NewsCardTitle}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Margin="0,0,10,0"/>
+
+                                                        <Border Grid.Column="1"
+                                                                CornerRadius="999"
+                                                                Padding="8,2"
+                                                                Background="#00000000"
+                                                                BorderThickness="1"
+                                                                BorderBrush="#1F2E52"
+                                                                Opacity="0.95"
+                                                                VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Tag}"
+                                                                       Foreground="#BFD6FF"
+                                                                       FontSize="10"
+                                                                       FontWeight="SemiBold"
+                                                                       FontFamily="Segoe UI Variable Text"/>
+                                                        </Border>
+                                                    </Grid>
+
+                                                    <!-- Date -->
+                                                    <TextBlock Grid.Row="1"
+                                                               Text="{Binding DateText}"
+                                                               Style="{StaticResource NewsCardMeta}"
+                                                               Margin="0,0,0,6"/>
+
+                                                    <!-- Body -->
+                                                    <TextBlock Grid.Row="2"
+                                                               Text="{Binding Body}"
+                                                               Style="{StaticResource NewsCardBody}"/>
+
+                                                    <!-- Link -->
+                                                    <TextBlock Grid.Row="3"
+                                                               Text="Leer más →"
+                                                               Foreground="#8FD3FF"
+                                                               FontSize="11.5"
+                                                               Margin="0,8,0,0"
+                                                               Cursor="Hand"
+                                                               Visibility="{Binding HasLink}"
+                                                               MouseLeftButtonUp="NewsLink_Click"/>
+                                                </Grid>
+
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
                         </ScrollViewer>
                     </Grid>
                 </Border>
@@ -276,39 +777,34 @@
                         Background="#0E1A2F"
                         CornerRadius="16"
                         Padding="16"
-                        Margin="16,0,-24,0"
-                        Opacity="0.95">
+                        Margin="16,0,-16,0"
+                        Opacity="0.90">
 
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
                         <!-- Portal area -->
                         <Grid HorizontalAlignment="Center"
                               VerticalAlignment="Center"
-                              Width="560"
+                              Width="540"
                               Height="420">
 
                             <!-- HALO GRANDE -->
                             <Ellipse Width="520"
                                      Height="520"
-                                     HorizontalAlignment="Left"
+                                     HorizontalAlignment="Center"
                                      VerticalAlignment="Top"
-                                     Margin="20,-10,0,0"
+                                     Margin="0,-10,0,0"
                                      Opacity="0.18"
                                      IsHitTestVisible="False"
                                      RenderTransformOrigin="0.5,0.5"
                                      Panel.ZIndex="15">
                                 <Ellipse.RenderTransform>
-                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
                                 </Ellipse.RenderTransform>
 
                                 <Ellipse.Fill>
                                     <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
-                                        <GradientStop Color="#4038BDF8" Offset="0"/>
-                                        <GradientStop Color="#0038BDF8" Offset="1"/>
+                                        <GradientStop Color="#4038BDF8" Offset="0" />
+                                        <GradientStop Color="#0038BDF8" Offset="1" />
                                     </RadialGradientBrush>
                                 </Ellipse.Fill>
 
@@ -318,13 +814,13 @@
                                             <Storyboard RepeatBehavior="Forever" AutoReverse="True">
                                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                  From="0.12" To="0.22"
-                                                                 Duration="0:0:3.4"/>
+                                                                 Duration="0:0:3.4" />
                                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                                                  From="0.99" To="1.03"
-                                                                 Duration="0:0:3.4"/>
+                                                                 Duration="0:0:3.4" />
                                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                                                  From="0.99" To="1.03"
-                                                                 Duration="0:0:3.4"/>
+                                                                 Duration="0:0:3.4" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger>
@@ -336,19 +832,19 @@
                                      Height="340"
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Top"
-                                     Margin="108,60,0,0"
+                                     Margin="74,71,0,0"
                                      Opacity="0.45"
                                      IsHitTestVisible="False"
                                      RenderTransformOrigin="0.5,0.5"
                                      Panel.ZIndex="20">
                                 <Ellipse.RenderTransform>
-                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
                                 </Ellipse.RenderTransform>
 
                                 <Ellipse.Fill>
                                     <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
-                                        <GradientStop Color="#8038BDF8" Offset="0"/>
-                                        <GradientStop Color="#0038BDF8" Offset="1"/>
+                                        <GradientStop Color="#8038BDF8" Offset="0" />
+                                        <GradientStop Color="#0038BDF8" Offset="1" />
                                     </RadialGradientBrush>
                                 </Ellipse.Fill>
 
@@ -358,13 +854,13 @@
                                             <Storyboard RepeatBehavior="Forever" AutoReverse="True">
                                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                  From="0.32" To="0.52"
-                                                                 Duration="0:0:2.7"/>
+                                                                 Duration="0:0:2.7" />
                                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                                                  From="0.98" To="1.05"
-                                                                 Duration="0:0:2.7"/>
+                                                                 Duration="0:0:2.7" />
                                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                                                  From="0.98" To="1.05"
-                                                                 Duration="0:0:2.7"/>
+                                                                 Duration="0:0:2.7" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger>
@@ -374,62 +870,96 @@
                             <!-- Portal frame -->
                             <Border CornerRadius="18"
                                     ClipToBounds="True"
-                                    Width="600"
+                                    Width="540"
                                     Height="360"
                                     Panel.ZIndex="10">
                                 <Grid>
                                     <Image x:Name="PortalBaseImage"
                                            Source="/Assets/portal.jpg"
                                            Stretch="UniformToFill"
-                                           Opacity="0.92"
-                                           Margin="-98,0,-60,0"/>
+                                           Opacity="0.88"
+                                           Margin="-88,0,-52,0" />
 
-                                    <Ellipse Width="305"
-                                             Height="292"
+                                    <Ellipse Width="299"
+                                             Height="284"
                                              HorizontalAlignment="Left"
                                              VerticalAlignment="Top"
-                                             Margin="130,86,0,0"
-                                             Opacity="1"
+                                             Margin="106,76,0,0"
+                                             Opacity="0.26"
+                                             RenderOptions.BitmapScalingMode="Fant"
                                              IsHitTestVisible="False">
                                         <Ellipse.Fill>
                                             <ImageBrush x:Name="VortexBrush"
                                                         ImageSource="/Assets/vortex.png"
-                                                        Stretch="UniformToFill"
+                                                        Stretch="Uniform"
                                                         AlignmentX="Center"
                                                         AlignmentY="Center">
                                                 <ImageBrush.RelativeTransform>
-                                                    <RotateTransform Angle="0" CenterX="0.5" CenterY="0.5"/>
+                                                    <RotateTransform Angle="0" CenterX="0.5" CenterY="0.5" />
                                                 </ImageBrush.RelativeTransform>
                                             </ImageBrush>
                                         </Ellipse.Fill>
                                     </Ellipse>
 
-                                    <Rectangle>
-                                        <Rectangle.Fill>
-                                            <RadialGradientBrush RadiusX="0.85" RadiusY="0.85"
-                                                                 Center="0.5,0.45" GradientOrigin="0.5,0.45">
-                                                <GradientStop Color="#00000000" Offset="0"/>
-                                                <GradientStop Color="#880B1220" Offset="1"/>
-                                            </RadialGradientBrush>
-                                        </Rectangle.Fill>
-                                    </Rectangle>
+                                    <!-- Perimeter edge fade -->
+                                    <Grid IsHitTestVisible="False" Panel.ZIndex="60">
 
-                                    <Rectangle VerticalAlignment="Bottom" Height="140">
+                                        <!-- Top -->
+                                        <Rectangle VerticalAlignment="Top" Height="80">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                        <!-- Bottom -->
+                                        <Rectangle VerticalAlignment="Bottom" Height="90">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                        <!-- Left -->
+                                        <Rectangle HorizontalAlignment="Left" Width="90">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                        <!-- Right -->
+                                        <Rectangle HorizontalAlignment="Right" Width="90">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                    </Grid>
+
+                                    <!-- Bottom fade -->
+                                    <Rectangle VerticalAlignment="Bottom" Height="140" IsHitTestVisible="False">
                                         <Rectangle.Fill>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="#00000000" Offset="0"/>
-                                                <GradientStop Color="#0E1A2F" Offset="1"/>
+                                                <GradientStop Color="#00000000" Offset="0" />
+                                                <GradientStop Color="#0E1A2F" Offset="1" />
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
                                     </Rectangle>
                                 </Grid>
                             </Border>
 
-                            <!-- Oscurecido circular -->
-                            <Ellipse Width="250"
-                                     Height="250"
-                                     VerticalAlignment="Top"
-                                     Margin="155,161,155,0"
+                            <!-- Dark circle -->
+                            <Ellipse Margin="129,125,162,52"
                                      Opacity="1"
                                      Panel.ZIndex="30">
                                 <Ellipse.Fill>
@@ -437,39 +967,230 @@
                                                          GradientOrigin="0.5,0.5"
                                                          RadiusX="0.60"
                                                          RadiusY="0.60">
-                                        <GradientStop Color="#E60B1220" Offset="0"/>
-                                        <GradientStop Color="#800B1220" Offset="0.45"/>
-                                        <GradientStop Color="#000B1220" Offset="1"/>
+                                        <GradientStop Color="#E60B1220" Offset="0" />
+                                        <GradientStop Color="#800B1220" Offset="0.45" />
+                                        <GradientStop Color="#000B1220" Offset="1" />
                                     </RadialGradientBrush>
                                 </Ellipse.Fill>
                             </Ellipse>
 
-                            <!-- PLAY -->
-                            <Button Style="{StaticResource PlayButtonStyle}"
-                                    VerticalAlignment="Top"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,256,0,0"
-                                    Panel.ZIndex="40">
-                                <TextBlock Text="PLAY"/>
-                            </Button>
+                            <!-- PLAY + PROGRESO + ESTADO -->
+                            <Canvas Panel.ZIndex="45">
+
+                                <!-- PLAY (habilitado al 100%) -->
+                                <Button Style="{StaticResource PlayButtonStyleReady}"
+                                        IsEnabled="{Binding IsReadyToPlay}"
+                                        Canvas.Left="158"
+                                        Canvas.Top="250"
+                                        Height="54"
+                                        Width="189">
+                                    <TextBlock Text="PLAY" />
+                                </Button>
+
+                                <!-- HALO detrás de la barra -->
+                                <Ellipse Canvas.Left="1"
+                                         Canvas.Top="353"
+                                         Width="539"
+                                         Height="25"
+                                         Opacity="1"
+                                         IsHitTestVisible="False"
+                                         Panel.ZIndex="1"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Center">
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.60" RadiusY="0.55">
+                                            <GradientStop Color="#8038BDF8" Offset="0"/>
+                                            <GradientStop Color="#0038BDF8" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
+                                    <Ellipse.Effect>
+                                        <BlurEffect Radius="18"/>
+                                    </Ellipse.Effect>
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                     From="0.10" To="0.20"
+                                                                     Duration="0:0:2.8"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+
+                                <!-- Soft glow horizontal detrás de la barra -->
+                                <Rectangle Canvas.Left="-21"
+                                           Canvas.Top="346"
+                                           Width="582"
+                                           Height="37"
+                                           RadiusX="20"
+                                           RadiusY="20"
+                                           Opacity="0.18"
+                                           IsHitTestVisible="False"
+                                           Panel.ZIndex="1"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Top">
+                                    <Rectangle.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5"
+                                                             RadiusX="0.9"
+                                                             RadiusY="0.5">
+                                            <GradientStop Color="#8038BDF8" Offset="0"/>
+                                            <GradientStop Color="#0038BDF8" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Rectangle.Fill>
+
+                                    <Rectangle.Effect>
+                                        <BlurEffect Radius="18"/>
+                                    </Rectangle.Effect>
+                                </Rectangle>
+
+                                <!-- Barra (baja opacidad cuando IsReadyToPlay=true) -->
+                                <ProgressBar x:Name="ProgressBarMain"
+             Canvas.Top="353"
+             Width="540"
+             Minimum="0"
+             Maximum="100"
+             Value="{Binding PatchProgress}"
+             Panel.ZIndex="2"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Height="22"
+             RenderTransformOrigin="0.5,0.5">
+                                    <ProgressBar.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform Angle="-0.008"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </ProgressBar.RenderTransform>
+
+                                    <!-- Un solo Style (basado en el tuyo) -->
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar" BasedOn="{StaticResource ProgressPillStyle}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                    <Setter Property="Opacity" Value="0.55"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
+
+                                <!-- % centrado debajo de la barra -->
+                                <TextBlock Text="{Binding PatchProgress, StringFormat={}{0:0}%}"
+                                           Canvas.Left="-18"
+                                           Canvas.Top="383"
+                                           Width="540"
+                                           TextAlignment="Center"
+                                           FontSize="12"
+                                           Foreground="#BFD6FF"
+                                           Opacity="0.75"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- Frase grande graciosa (NO listo) -->
+                                <TextBlock Text="{Binding StatusHeadline}"
+                                           Canvas.Left="42"
+                                           Canvas.Top="406"
+                                           Width="420"
+                                           TextAlignment="Center"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EAF2FF"
+                                           Opacity="0.95"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Frase grande (LISTO) -->
+                                <TextBlock Text="Portal estabilizado. Listo para entrar."
+                                           Canvas.Left="42"
+                                           Canvas.Top="406"
+                                           Width="420"
+                                           TextAlignment="Center"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#EAF2FF"
+                                           Opacity="0.95"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Detalle pequeño técnico (NO listo) -->
+                                <TextBlock Text="{Binding StatusDetail}"
+                                           Canvas.Left="42"
+                                           Canvas.Top="431"
+                                           Width="420"
+                                           TextAlignment="Center"
+                                           FontSize="11"
+                                           Foreground="#9CB3D9"
+                                           Opacity="0.9"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Detalle pequeño (LISTO) -->
+                                <TextBlock Text="Todo actualizado. Buen viaje, aventurero."
+                                           Canvas.Left="42"
+                                           Canvas.Top="431"
+                                           Width="420"
+                                           TextAlignment="Center"
+                                           FontSize="11"
+                                           Foreground="#9CB3D9"
+                                           Opacity="0.9"
+                                           TextWrapping="Wrap"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                            </Canvas>
+
                         </Grid>
-
-                        <!-- Status text -->
-                        <StackPanel Grid.Row="1"
-                                    Margin="0,12,0,0"
-                                    HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding StatusTitle}"
-                                       Foreground="#D7E3FF"
-                                       FontSize="13"
-                                       FontWeight="SemiBold"
-                                       HorizontalAlignment="Center" />
-                            <TextBlock Text="{Binding StatusSubtitle}"
-                                       Foreground="#90A4C3"
-                                       FontSize="12"
-                                       Margin="0,4,0,0"
-                                       HorizontalAlignment="Center" />
-                        </StackPanel>
-
                     </Grid>
                 </Border>
             </Grid>
