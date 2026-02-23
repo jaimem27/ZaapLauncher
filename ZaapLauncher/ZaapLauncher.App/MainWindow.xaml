@@ -979,6 +979,7 @@
 
                                 <!-- PLAY (habilitado al 100%) -->
                                 <Button Style="{StaticResource PlayButtonStyleReady}"
+                                        Command="{Binding PlayCommand}"
                                         IsEnabled="{Binding IsReadyToPlay}"
                                         Canvas.Left="158"
                                         Canvas.Top="250"
