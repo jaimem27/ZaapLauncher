@@ -980,6 +980,7 @@
                                 <!-- PLAY (habilitado al 100%) -->
                                 <Button Style="{StaticResource PlayButtonStyleReady}"
                                         IsEnabled="{Binding IsReadyToPlay}"
+                                        Command="{Binding PlayCommand}"
                                         Canvas.Left="158"
                                         Canvas.Top="250"
                                         Height="54"
@@ -1051,7 +1052,7 @@
              Width="540"
              Minimum="0"
              Maximum="100"
-             Value="{Binding PatchProgress}"
+             Value="{Binding PatchProgress, Mode=OneWay}"
              Panel.ZIndex="2"
              HorizontalAlignment="Center"
              VerticalAlignment="Center"

@@ -1,0 +1,16 @@
+{
+  "version": "local-test-1",
+  "baseUrl": "local://Assets/update-sim/source/",
+  "files": [
+    {
+      "path": "Dofus.exe",
+      "sha256": "",
+      "size": 59
+    },
+    {
+      "path": "data/config.xml",
+      "sha256": "",
+      "size": 59
+    }
+  ]
+}
