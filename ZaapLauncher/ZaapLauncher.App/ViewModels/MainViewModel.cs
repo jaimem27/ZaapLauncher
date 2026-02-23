@@ -123,10 +123,21 @@ public sealed class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
         }
+        catch (UpdateFlowException ex)
+        {
+            StatusHeadline = ex.Headline;
+            StatusDetail = ex.Detail;
+            SetPatchProgressTarget(Math.Min(PatchProgress, 98));
+            IsReadyToPlay = false;
+            ServerStatusText = "Error";
+            ServerStatusColor = Brushes.OrangeRed;
+            OnPropertyChanged(nameof(ServerStatusText));
+            OnPropertyChanged(nameof(ServerStatusColor));
+        }
         catch (Exception ex)
         {
             StatusHeadline = "Ha ocurrido un error en el portal.";
-            StatusDetail = ex.Message;
+            StatusDetail = $"{ex.GetType().Name}: {ex.Message}";
             IsReadyToPlay = false;
             ServerStatusText = "Offline";
             ServerStatusColor = Brushes.IndianRed;

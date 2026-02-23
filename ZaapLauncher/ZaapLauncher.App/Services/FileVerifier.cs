@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using ZaapLauncher.App.Models;
@@ -47,6 +49,12 @@ public sealed class FileVerifier
                     ok = info.Length == file.Size;
                 }
 
+                if (ok && !string.IsNullOrWhiteSpace(file.Sha256))
+                {
+                    var localHash = Sha256File(fullPath, ct);
+                    ok = string.Equals(localHash, file.Sha256, StringComparison.OrdinalIgnoreCase);
+                }
+
                 if (!ok)
                     result.MissingOrInvalid.Add(file);
 
@@ -60,9 +68,47 @@ public sealed class FileVerifier
         }, ct);
     }
 
-    public Task QuickCheckAsync(string installDir, Manifest manifest, CancellationToken ct)
+    public async Task QuickCheckAsync(string installDir, Manifest manifest, CancellationToken ct)
     {
-        ct.ThrowIfCancellationRequested();
-        return Task.CompletedTask;
+        foreach (var file in manifest.Files)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var fullPath = Path.Combine(installDir, file.Path);
+            if (!File.Exists(fullPath))
+                throw new UpdateFlowException("Comprobación final fallida.", $"No se encontró {file.Path} tras actualizar.");
+
+            if (file.Size > 0)
+            {
+                var info = new FileInfo(fullPath);
+                if (info.Length != file.Size)
+                    throw new UpdateFlowException("Comprobación final fallida.", $"Tamaño inesperado en {file.Path}.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(file.Sha256))
+            {
+                var hash = await Sha256FileAsync(fullPath, ct);
+                if (!string.Equals(hash, file.Sha256, StringComparison.OrdinalIgnoreCase))
+                    throw new UpdateFlowException("Comprobación final fallida.", $"Hash inválido en {file.Path}.");
+            }
+        }
     }
+
+    public static async Task<string> Sha256FileAsync(string path, CancellationToken ct)
+    {
+        await using var stream = File.OpenRead(path);
+        using var sha = SHA256.Create();
+        var hash = await sha.ComputeHashAsync(stream, ct);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static string Sha256File(string path, CancellationToken ct)
+    {
+        using var stream = File.OpenRead(path);
+        using var sha = SHA256.Create();
+        var hash = sha.ComputeHash(stream);
+        ct.ThrowIfCancellationRequested();
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
 }

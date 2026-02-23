@@ -39,7 +39,13 @@ public sealed class ManifestService
         });
 
         if (manifest is null)
-            throw new InvalidOperationException($"No se pudo deserializar el manifest de {source}.");
+            throw new UpdateFlowException("Manifest inválido.", $"No se pudo deserializar el manifest de {source}.");
+
+        if (string.IsNullOrWhiteSpace(manifest.BaseUrl))
+            throw new UpdateFlowException("Manifest inválido.", $"El manifest de {source} no contiene baseUrl.");
+
+        if (manifest.Files is null)
+            throw new UpdateFlowException("Manifest inválido.", $"El manifest de {source} no contiene archivos.");
 
         return manifest;
     }
