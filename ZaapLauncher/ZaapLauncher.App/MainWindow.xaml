@@ -143,6 +143,43 @@
             </Setter>
         </Style>
 
+        <Style x:Key="HeaderActionButton" TargetType="Button">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Background" Value="#0E1A2F" />
+            <Setter Property="BorderBrush" Value="#1F2E52" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="#BFD6FF" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                CornerRadius="999"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#162747" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#2D4B77" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#0B1430" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
         <!-- PLAY button style -->
         <Style x:Key="PlayButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="210" />
@@ -290,7 +327,7 @@
         <Style x:Key="ProgressPillStyle" TargetType="ProgressBar">
             <Setter Property="Height" Value="10"/>
             <Setter Property="Background" Value="#0B162B"/>
-            <Setter Property="Foreground" Value="#2AA8FF"/>
+            <Setter Property="Foreground" Value="#38BDF8"/>
             <Setter Property="BorderBrush" Value="#132443"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -309,15 +346,21 @@
                             <!-- Indicador -->
                             <Border x:Name="PART_Indicator"
                                     CornerRadius="999"
-                                    Background="{TemplateBinding Foreground}"
-                                    Margin="1"
-                                    HorizontalAlignment="Left">
+                                    Margin="1">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#6DE0FF" Offset="0"/>
+                                        <GradientStop Color="#38BDF8" Offset="0.45"/>
+                                        <GradientStop Color="#0EA5E9" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <Border.Effect>
                                     <DropShadowEffect Color="#38BDF8"
-                                                      BlurRadius="14"
+                                                      BlurRadius="16"
                                                       ShadowDepth="0"
-                                                      Opacity="0.22"/>
+                                                      Opacity="0.36"/>
                                 </Border.Effect>
+                                <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="999" Opacity="0.7"/>
                             </Border>
 
                             <!-- Sheen -->
@@ -563,7 +606,7 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Right: status + buttons -->
+                    <!-- Right: status + actions -->
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center"
@@ -592,12 +635,15 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Vertical separator -->
-                        <Border Width="1"
-                                Height="20"
-                                Background="#1F2E52"
-                                Opacity="0.33"
-                                Margin="0,0,10,0" />
+                        <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
+
+                        <Button Style="{StaticResource HeaderActionButton}"
+                                ToolTip="Verifica y repara archivos"
+                                Command="{Binding RepairCommand}"
+                                Margin="0,0,10,0"
+                                Content="Reparar" />
+
+                        <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
 
                         <!-- Discord -->
                         <Button Style="{StaticResource HeaderIconButton}"

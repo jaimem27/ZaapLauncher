@@ -31,11 +31,6 @@ namespace ZaapLauncher.App
 
         }
 
-        private void Repair_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.StartUpdate(forceRepair: true);
-        }
-
         private void NewsLink_Click(object sender, MouseButtonEventArgs e)
         {
             if (sender is TextBlock tb && tb.DataContext is NewsItem item && !string.IsNullOrWhiteSpace(item.Link))

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ZaapLauncher.App.Models;
@@ -21,16 +23,17 @@ public sealed class UpdateOrchestrator
 
         try
         {
-            progress.Report(new UpdateProgress(UpdateStage.FetchManifest, 1,
+            Directory.CreateDirectory(Paths.LauncherDataDir);
+            Directory.CreateDirectory(Paths.TempDownloadDir);
+            Directory.CreateDirectory(Paths.BackupDir);
+
+            progress.Report(new UpdateProgress(UpdateStage.FetchManifest, 2,
                 "Abriendo runas de actualización…", "Descargando manifiesto"));
 
             var manifest = await _manifestService.FetchAsync(ct);
 
-            progress.Report(new UpdateProgress(UpdateStage.FetchManifest, 10,
-                "Preparando portal de actualización…", forceRepair ? "Modo repair: re-verificación completa" : "Manifest cargado"));
-
             progress.Report(new UpdateProgress(UpdateStage.VerifyFiles, 10,
-                "Escaneando el grimorio…", "Verificando archivos locales"));
+                "Escaneando el grimorio…", forceRepair ? "Modo repair: re-verificación completa" : "Verificando archivos locales"));
 
             var verifyResult = await _fileVerifier.VerifyAsync(
                 installDir,
@@ -41,6 +44,7 @@ public sealed class UpdateOrchestrator
                 spanPercent: 25);
 
             var toDownload = verifyResult.MissingOrInvalid;
+            var totalBytes = toDownload.Sum(x => Math.Max(0, x.Size));
 
             if (toDownload.Count == 0)
             {
@@ -55,10 +59,13 @@ public sealed class UpdateOrchestrator
             }
 
             progress.Report(new UpdateProgress(UpdateStage.Downloading, 35,
-                "Cargando kamas al transportista…", $"Descargando {toDownload.Count} archivos"));
+                "Generando plan de actualización…",
+                $"{toDownload.Count} archivos ({FormatBytes(totalBytes)}) por descargar"));
 
-            await _downloadService.DownloadAsync(
-                installDir,
+            CleanTempDirectory(Paths.TempDownloadDir);
+
+            var readyFiles = await _downloadService.DownloadAsync(
+                Paths.TempDownloadDir,
                 manifest.BaseUrl,
                 toDownload,
                 progress,
@@ -67,11 +74,12 @@ public sealed class UpdateOrchestrator
                 spanPercent: 55);
 
             progress.Report(new UpdateProgress(UpdateStage.Applying, 90,
-                "Encajando runas en el portal…", "Aplicando cambios"));
+                "Aplicando actualización…", "Realizando reemplazo atómico de archivos"));
 
             await _patchApplier.ApplyAsync(
                 installDir,
-                toDownload,
+                Paths.BackupDir,
+                readyFiles,
                 progress,
                 ct,
                 basePercent: 90,
@@ -100,4 +108,29 @@ public sealed class UpdateOrchestrator
         }
        
     }
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB"];
+        double value = Math.Max(0, bytes);
+        var unitIndex = 0;
+        while (value >= 1024 && unitIndex < units.Length - 1)
+        {
+            value /= 1024;
+            unitIndex++;
+        }
+
+
+        return $"{value:0.##} {units[unitIndex]}";
+    }
+
+    private static void CleanTempDirectory(string path)
+    {
+        if (!Directory.Exists(path))
+            return;
+
+        foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+            File.Delete(file);
+    }
+
 }

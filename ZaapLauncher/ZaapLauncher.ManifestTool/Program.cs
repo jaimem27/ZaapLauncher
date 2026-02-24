@@ -9,7 +9,7 @@ if (args.Length < 2)
 
 var sourceDir = Path.GetFullPath(args[0]);
 var outputPath = Path.GetFullPath(args[1]);
-var baseUrl = args.Length >= 3 ? args[2] : "local://Assets/update-sim/source/";
+var baseUrl = args.Length >= 3 ? args[2] : "https://cdn.example.com/game/";
 var version = args.Length >= 4 ? args[3] : $"build-{DateTime.UtcNow:yyyyMMddHHmmss}";
 
 if (!Directory.Exists(sourceDir))

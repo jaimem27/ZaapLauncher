@@ -8,6 +8,8 @@ using ZaapLauncher.App.Models;
 
 namespace ZaapLauncher.App.Services;
 
+public sealed record DownloadedFile(ManifestFile ManifestFile, string ReadyPath);
+
 public sealed class DownloadService
 {
     private static readonly HttpClient Http = new();
@@ -19,8 +21,8 @@ public sealed class DownloadService
         TimeSpan.FromMilliseconds(1500)
     ];
 
-    public async Task DownloadAsync(
-        string installDir,
+    public async Task<List<DownloadedFile>> DownloadAsync(
+        string tempRoot,
         string baseUrl,
         List<ManifestFile> files,
         IProgress<UpdateProgress> progress,
@@ -28,46 +30,51 @@ public sealed class DownloadService
         double basePercent,
         double spanPercent)
     {
+        Directory.CreateDirectory(tempRoot);
+
         long totalBytes = 0;
         foreach (var file in files)
             totalBytes += Math.Max(0, file.Size);
 
         long downloadedBytes = 0;
+        var downloadedFiles = new List<DownloadedFile>(files.Count);
 
         for (var i = 0; i < files.Count; i++)
         {
             ct.ThrowIfCancellationRequested();
-            var file = files[i];
-
-            var fullPath = Path.Combine(installDir, file.Path);
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+            var file = files[i];         
 
             progress.Report(new UpdateProgress(
-                            UpdateStage.Downloading,
-                            basePercent + spanPercent * Clamp01(downloadedBytes / (double)Math.Max(1, totalBytes)),
-                            "Cargando kamas al transportista…",
-                            $"Descargando {i + 1}/{files.Count}: {file.Path}"));
+                UpdateStage.Downloading,
+                basePercent + spanPercent * Clamp01(downloadedBytes / (double)Math.Max(1, totalBytes)),
+                "Descargando archivos del portal…",
+                $"Descargando {i + 1}/{files.Count}: {file.Path}"));
+
 
             var beforeFileBytes = downloadedBytes;
-            var bytesWritten = await DownloadWithRetriesAsync(baseUrl, file, fullPath, i, files.Count, read =>
+            var readyPath = BuildReadyPath(tempRoot, file.Path);
+            var bytesWritten = await DownloadWithRetriesAsync(baseUrl, file, readyPath, i, files.Count, read =>
             {
                 downloadedBytes = beforeFileBytes + read;
                 var percent = basePercent + spanPercent * Clamp01(downloadedBytes / (double)Math.Max(1, totalBytes));
                 progress.Report(new UpdateProgress(
-                                UpdateStage.Downloading,
+                    UpdateStage.Downloading,
                     percent,
                     "Cargando kamas al transportista…",
                     $"Recibiendo datos… ({i + 1}/{files.Count})"));
             }, ct);
 
             downloadedBytes = beforeFileBytes + bytesWritten;
+            downloadedFiles.Add(new DownloadedFile(file, readyPath));
         }
+
+        return downloadedFiles;
     }
 
     private static async Task<long> DownloadWithRetriesAsync(
         string baseUrl,
         ManifestFile file,
-        string destinationPath,
+        string readyPath,
         int index,
         int total,
         Action<long> onBytesWritten,
@@ -75,60 +82,70 @@ public sealed class DownloadService
     {
         Exception? lastError = null;
 
-        var tmpPath = destinationPath + ".tmp";
+        var partPath = readyPath + ".part";
 
         for (var attempt = 0; attempt <= RetryDelays.Length; attempt++)
         {
             try
             {
-                if (File.Exists(tmpPath))
-                    File.Delete(tmpPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(readyPath)!);
+                SafeDelete(partPath);
+                SafeDelete(readyPath);
 
-                long written;
-                if (IsLocalSource(baseUrl))
-                {
-                    var localSourcePath = BuildLocalSourcePath(baseUrl, file.Path);
-                    written = await CopyLocalFileAsync(localSourcePath, tmpPath, onBytesWritten, ct);
-                }
-                else
-                {
-                    var url = BuildUrl(baseUrl, file.Path);
-                    written = await DownloadRemoteFileAsync(url, tmpPath, onBytesWritten, ct);
-                }
+                var fileSource = ResolveDownloadSource(baseUrl, file);
+                var written = await DownloadRemoteFileAsync(fileSource, partPath, onBytesWritten, ct);
 
-                await ValidateTempFileAsync(tmpPath, file, ct);
-                File.Move(tmpPath, destinationPath, overwrite: true);
+                await ValidateTempFileAsync(partPath, file, ct);
+                File.Move(partPath, readyPath, overwrite: true);
 
                 return written;
             }
             catch (OperationCanceledException)
             {
-                SafeDelete(tmpPath);
+                SafeDelete(partPath);
                 throw;
             }
             catch (Exception ex) when (attempt < RetryDelays.Length)
             {
                 lastError = ex;
-                SafeDelete(tmpPath);
+                SafeDelete(partPath);
                 await Task.Delay(RetryDelays[attempt], ct);
             }
             catch (Exception ex)
             {
                 lastError = ex;
-                SafeDelete(tmpPath);
+                SafeDelete(partPath);
                 break;
             }
         }
 
         var reason = lastError?.Message is { Length: > 0 }
-        ? $" Motivo: {lastError.GetType().Name}: {lastError.Message}"
-        : string.Empty;
+            ? $" Motivo: {lastError.GetType().Name}: {lastError.Message}"
+            : string.Empty;
 
         throw new UpdateFlowException(
             "No se pudo completar la descarga.",
             $"Falló {file.Path} tras varios reintentos ({index + 1}/{total}).{reason}",
             lastError);
     }
+
+    private static string BuildReadyPath(string tempRoot, string relativePath)
+    {
+        var normalized = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        return Path.Combine(tempRoot, normalized + ".ready");
+    }
+
+    private static string ResolveDownloadSource(string baseUrl, ManifestFile file)
+    {
+        if (Uri.TryCreate(file.Url, UriKind.Absolute, out var absoluteFromFile))
+            return absoluteFromFile.ToString();
+
+        if (!string.IsNullOrWhiteSpace(file.Url))
+            return BuildUrl(baseUrl, file.Url);
+
+        return BuildUrl(baseUrl, file.Path);
+    }
+
 
     private static async Task<long> DownloadRemoteFileAsync(string url, string destinationPath, Action<long> onBytesWritten, CancellationToken ct)
     {
@@ -142,14 +159,6 @@ public sealed class DownloadService
         await using var output = File.Create(destinationPath);
 
         return await StreamCopyAsync(input, output, onBytesWritten, timeoutCts.Token);
-    }
-
-    private static async Task<long> CopyLocalFileAsync(string sourcePath, string destinationPath, Action<long> onBytesWritten, CancellationToken ct)
-    {
-        await using var input = File.OpenRead(sourcePath);
-        await using var output = File.Create(destinationPath);
-
-        return await StreamCopyAsync(input, output, onBytesWritten, ct);
     }
 
     private static async Task<long> StreamCopyAsync(Stream input, Stream output, Action<long> onBytesWritten, CancellationToken ct)
@@ -174,14 +183,14 @@ public sealed class DownloadService
         {
             var size = new FileInfo(tempPath).Length;
             if (size != file.Size)
-                throw new IOException($"Tamaño inválido en {file.Path}. Esperado {file.Size}, recibido {size}. Revisa manifest/source.");
+                throw new IOException($"Tamaño inválido en {file.Path}. Esperado {file.Size}, recibido {size}.");
         }
 
         if (!string.IsNullOrWhiteSpace(file.Sha256))
         {
             var hash = await FileVerifier.Sha256FileAsync(tempPath, ct);
             if (!string.Equals(hash, file.Sha256, StringComparison.OrdinalIgnoreCase))
-                throw new IOException($"Hash SHA-256 inválido en {file.Path}. Esperado {file.Sha256}, recibido {hash}. Revisa manifest/source.");
+                throw new IOException($"Hash SHA-256 inválido en {file.Path}. Esperado {file.Sha256}, recibido {hash}.");
         }
     }
 
@@ -196,14 +205,6 @@ public sealed class DownloadService
         {
             // ignore cleanup issues
         }
-    }
-
-    private static bool IsLocalSource(string baseUrl) => baseUrl.StartsWith("local://", StringComparison.OrdinalIgnoreCase);
-
-    private static string BuildLocalSourcePath(string baseUrl, string relativePath)
-    {
-        var localRoot = baseUrl["local://".Length..].TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
-        return Path.Combine(AppContext.BaseDirectory, localRoot, relativePath.Replace('/', Path.DirectorySeparatorChar));
     }
 
     private static double Clamp01(double value) => Math.Min(1d, Math.Max(0d, value));
