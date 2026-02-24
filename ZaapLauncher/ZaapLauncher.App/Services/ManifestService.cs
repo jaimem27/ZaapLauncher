@@ -12,7 +12,7 @@ public sealed class ManifestService
 {
     private static readonly HttpClient Http = new();
 
-    private const string DefaultManifestUrl = "C:\\Users\\unmis\\Desktop\\SHINSHEKAI\\Client Admin Ultimo";
+    private const string DefaultManifestUrl = "http://127.0.0.1:8080/manifest.json";
 
     public async Task<Manifest> FetchAsync(CancellationToken ct)
     {

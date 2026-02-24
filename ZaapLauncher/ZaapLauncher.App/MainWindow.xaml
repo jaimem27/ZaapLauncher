@@ -341,26 +341,23 @@
                                     CornerRadius="999"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="1"
+                                    ClipToBounds="True">
+                                <Border x:Name="PART_Indicator"
+                                        CornerRadius="0"
+                                        HorizontalAlignment="Left">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#6DE0FF" Offset="0"/>
+                                            <GradientStop Color="#38BDF8" Offset="0.45"/>
+                                            <GradientStop Color="#0EA5E9" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="0" Opacity="0.7"/>
+                                </Border>
 
-                            <!-- Indicador -->
-                            <Border x:Name="PART_Indicator"
-                                    CornerRadius="999"
-                                    Margin="1">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#6DE0FF" Offset="0"/>
-                                        <GradientStop Color="#38BDF8" Offset="0.45"/>
-                                        <GradientStop Color="#0EA5E9" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#38BDF8"
-                                                      BlurRadius="16"
-                                                      ShadowDepth="0"
-                                                      Opacity="0.36"/>
-                                </Border.Effect>
-                                <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="999" Opacity="0.7"/>
+                            
                             </Border>
 
                             <!-- Sheen -->
