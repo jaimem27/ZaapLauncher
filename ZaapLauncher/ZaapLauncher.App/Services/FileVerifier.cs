@@ -94,6 +94,47 @@ public sealed class FileVerifier
         }
     }
 
+    public Task<int> CleanupOrphansAsync(string installDir, Manifest manifest, IReadOnlyCollection<string> whitelist, CancellationToken ct)
+    {
+        return Task.Run(() =>
+        {
+            if (!Directory.Exists(installDir))
+                return 0;
+
+            var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in manifest.Files)
+                expected.Add(Normalize(item.Path));
+
+            var removed = 0;
+            foreach (var file in Directory.EnumerateFiles(installDir, "*", SearchOption.AllDirectories))
+            {
+                ct.ThrowIfCancellationRequested();
+                var rel = Normalize(Path.GetRelativePath(installDir, file));
+                if (expected.Contains(rel) || IsWhitelisted(rel, whitelist))
+                    continue;
+
+                File.Delete(file);
+                removed++;
+            }
+
+            return removed;
+        }, ct);
+    }
+
+    private static bool IsWhitelisted(string rel, IReadOnlyCollection<string> whitelist)
+    {
+        foreach (var item in whitelist)
+        {
+            var normalized = Normalize(item);
+            if (rel.Equals(normalized, StringComparison.OrdinalIgnoreCase) || rel.StartsWith(normalized + "/", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static string Normalize(string path) => path.Replace('\\', '/');
+
     public static async Task<string> Sha256FileAsync(string path, CancellationToken ct)
     {
         await using var stream = File.OpenRead(path);

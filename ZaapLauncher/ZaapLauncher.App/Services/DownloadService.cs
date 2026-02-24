@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using ZaapLauncher.App.Models;
@@ -16,9 +18,9 @@ public sealed class DownloadService
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan[] RetryDelays =
     [
-        TimeSpan.FromMilliseconds(250),
-        TimeSpan.FromMilliseconds(700),
-        TimeSpan.FromMilliseconds(1500)
+        TimeSpan.FromMilliseconds(350),
+        TimeSpan.FromMilliseconds(900),
+        TimeSpan.FromMilliseconds(1800)
     ];
 
     public async Task<List<DownloadedFile>> DownloadAsync(
@@ -42,14 +44,13 @@ public sealed class DownloadService
         for (var i = 0; i < files.Count; i++)
         {
             ct.ThrowIfCancellationRequested();
-            var file = files[i];         
+            var file = files[i];    
 
             progress.Report(new UpdateProgress(
                 UpdateStage.Downloading,
                 basePercent + spanPercent * Clamp01(downloadedBytes / (double)Math.Max(1, totalBytes)),
                 "Descargando archivos del portal…",
                 $"Descargando {i + 1}/{files.Count}: {file.Path}"));
-
 
             var beforeFileBytes = downloadedBytes;
             var readyPath = BuildReadyPath(tempRoot, file.Path);
@@ -81,7 +82,6 @@ public sealed class DownloadService
         CancellationToken ct)
     {
         Exception? lastError = null;
-
         var partPath = readyPath + ".part";
 
         for (var attempt = 0; attempt <= RetryDelays.Length; attempt++)
@@ -89,11 +89,10 @@ public sealed class DownloadService
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(readyPath)!);
-                SafeDelete(partPath);
                 SafeDelete(readyPath);
 
                 var fileSource = ResolveDownloadSource(baseUrl, file);
-                var written = await DownloadRemoteFileAsync(fileSource, partPath, onBytesWritten, ct);
+                var written = await DownloadRemoteFileResumableAsync(fileSource, partPath, onBytesWritten, ct);
 
                 await ValidateTempFileAsync(partPath, file, ct);
                 File.Move(partPath, readyPath, overwrite: true);
@@ -102,22 +101,21 @@ public sealed class DownloadService
             }
             catch (OperationCanceledException)
             {
-                SafeDelete(partPath);
                 throw;
             }
             catch (Exception ex) when (attempt < RetryDelays.Length)
             {
                 lastError = ex;
-                SafeDelete(partPath);
                 await Task.Delay(RetryDelays[attempt], ct);
             }
             catch (Exception ex)
             {
                 lastError = ex;
-                SafeDelete(partPath);
                 break;
             }
         }
+
+        SafeDelete(partPath);
 
         var reason = lastError?.Message is { Length: > 0 }
             ? $" Motivo: {lastError.GetType().Name}: {lastError.Message}"
@@ -146,19 +144,34 @@ public sealed class DownloadService
         return BuildUrl(baseUrl, file.Path);
     }
 
-
-    private static async Task<long> DownloadRemoteFileAsync(string url, string destinationPath, Action<long> onBytesWritten, CancellationToken ct)
+    private static async Task<long> DownloadRemoteFileResumableAsync(string url, string destinationPath, Action<long> onBytesWritten, CancellationToken ct)
     {
         using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         timeoutCts.CancelAfter(RequestTimeout);
 
-        using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, timeoutCts.Token);
+        long existingBytes = 0;
+        if (File.Exists(destinationPath))
+            existingBytes = new FileInfo(destinationPath).Length;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        if (existingBytes > 0)
+            request.Headers.Range = new RangeHeaderValue(existingBytes, null);
+
+        using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeoutCts.Token);
+
+        if (existingBytes > 0 && response.StatusCode == HttpStatusCode.OK)
+        {
+            SafeDelete(destinationPath);
+            existingBytes = 0;
+        }
+
         response.EnsureSuccessStatusCode();
 
         await using var input = await response.Content.ReadAsStreamAsync(timeoutCts.Token);
-        await using var output = File.Create(destinationPath);
+        await using var output = new FileStream(destinationPath, existingBytes > 0 ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None);
 
-        return await StreamCopyAsync(input, output, onBytesWritten, timeoutCts.Token);
+        onBytesWritten(existingBytes);
+        return await StreamCopyAsync(input, output, totalNew => onBytesWritten(existingBytes + totalNew), timeoutCts.Token);
     }
 
     private static async Task<long> StreamCopyAsync(Stream input, Stream output, Action<long> onBytesWritten, CancellationToken ct)

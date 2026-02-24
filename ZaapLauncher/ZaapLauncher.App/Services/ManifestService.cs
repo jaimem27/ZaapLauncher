@@ -16,7 +16,8 @@ public sealed class ManifestService
 
     public async Task<Manifest> FetchAsync(CancellationToken ct)
     {
-        var manifestUrl = ResolveManifestUrl();
+        var settings = LoadSettings();
+        var manifestUrl = ResolveManifestUrl(settings);
 
         if (string.Equals(manifestUrl, DefaultManifestUrl, StringComparison.OrdinalIgnoreCase))
         {
@@ -28,7 +29,9 @@ public sealed class ManifestService
             }
 
             var cachedJson = await File.ReadAllTextAsync(Paths.ManifestCachePath, ct);
-            return DeserializeManifest(cachedJson, "cache local");
+            var cachedManifest = DeserializeManifest(cachedJson, "cache local");
+            ManifestSignatureVerifier.VerifyOrThrow(cachedJson, cachedManifest, settings.AllowUnsignedManifest);
+            return cachedManifest;
         }
 
         using var resp = await Http.GetAsync(manifestUrl, ct);
@@ -36,6 +39,7 @@ public sealed class ManifestService
 
         var remoteJson = await resp.Content.ReadAsStringAsync(ct);
         var manifest = DeserializeManifest(remoteJson, manifestUrl);
+        ManifestSignatureVerifier.VerifyOrThrow(remoteJson, manifest, settings.AllowUnsignedManifest);
 
         Directory.CreateDirectory(Path.GetDirectoryName(Paths.ManifestCachePath)!);
         await File.WriteAllTextAsync(Paths.ManifestCachePath, remoteJson, ct);
@@ -43,21 +47,32 @@ public sealed class ManifestService
         return manifest;
     }
 
-    private static string ResolveManifestUrl()
+    private static string ResolveManifestUrl(LauncherSettings settings)
     {
         var env = Environment.GetEnvironmentVariable("ZAAP_MANIFEST_URL");
         if (!string.IsNullOrWhiteSpace(env))
             return env.Trim();
 
-        if (File.Exists(Paths.SettingsPath))
-        {
-            var json = File.ReadAllText(Paths.SettingsPath);
-            var settings = JsonSerializer.Deserialize<LauncherSettings>(json, SerializerOptions());
-            if (!string.IsNullOrWhiteSpace(settings?.ManifestUrl))
-                return settings.ManifestUrl.Trim();
-        }
+        if (!string.IsNullOrWhiteSpace(settings.ManifestUrl))
+            return settings.ManifestUrl.Trim();
 
         return DefaultManifestUrl;
+    }
+
+    private static LauncherSettings LoadSettings()
+    {
+        if (!File.Exists(Paths.SettingsPath))
+            return new LauncherSettings();
+
+        try
+        {
+            var json = File.ReadAllText(Paths.SettingsPath);
+            return JsonSerializer.Deserialize<LauncherSettings>(json, SerializerOptions()) ?? new LauncherSettings();
+        }
+        catch
+        {
+            return new LauncherSettings();
+        }
     }
 
     private static Manifest DeserializeManifest(string json, string source)
@@ -83,5 +98,6 @@ public sealed class ManifestService
     private sealed class LauncherSettings
     {
         public string ManifestUrl { get; set; } = "";
+        public bool AllowUnsignedManifest { get; set; }
     }
 }

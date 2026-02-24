@@ -337,7 +337,7 @@
                         <Grid x:Name="Root" ClipToBounds="True" SnapsToDevicePixels="True">
 
                             <!-- Track -->
-                            <Border x:Name="Track"
+                            <Border x:Name="PART_Track"
                                     CornerRadius="999"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"

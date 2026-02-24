@@ -6,6 +6,8 @@ public sealed class Manifest
 {
     public string Version { get; set; } = "";
     public string BaseUrl { get; set; } = "";
+    public string SignatureAlgorithm { get; set; } = "";
+    public string Signature { get; set; } = "";
     public List<ManifestFile> Files { get; set; } = new();
 }
 

@@ -18,4 +18,6 @@ public static class Paths
     public static readonly string SettingsPath = Path.Combine(LauncherDataDir, "settings.json");
 
     public static readonly string ManifestCachePath = Path.Combine(LauncherDataDir, "cache", "manifest.json");
+
+    public static readonly string UpdateStatePath = Path.Combine(LauncherDataDir, "update_state.json");
 }

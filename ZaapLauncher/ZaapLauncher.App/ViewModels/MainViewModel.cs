@@ -70,7 +70,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public MainViewModel()
     {
-        PlayCommand = new RelayCommand(_ => Launch(), _ => IsReadyToPlay);
+        PlayCommand = new RelayCommand(_ => Launch(), _ => IsReadyToPlay && !File.Exists(Paths.UpdateStatePath));
         RepairCommand = new RelayCommand(_ => StartUpdate(forceRepair: true));
         CancelUpdateCommand = new RelayCommand(_ => _updateCts?.Cancel(), _ => _updateCts is not null);
 
@@ -184,6 +184,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void Launch()
     {
+        if (File.Exists(Paths.UpdateStatePath))
+            throw new InvalidOperationException("Hay una actualización pendiente de recuperar. Ejecuta reparar/actualizar antes de jugar.");
+
         var gameExe = Path.Combine(Paths.InstallDir, "Dofus.exe");
         if (!File.Exists(gameExe))
             throw new FileNotFoundException("No se encontró el ejecutable del juego.", gameExe);

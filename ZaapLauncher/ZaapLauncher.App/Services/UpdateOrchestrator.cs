@@ -9,10 +9,20 @@ namespace ZaapLauncher.App.Services;
 
 public sealed class UpdateOrchestrator
 {
+    private static readonly string[] RepairWhitelist =
+    [
+        "settings.json",
+        "logs",
+        "screenshots",
+        "config.ini"
+    ];
+
     private readonly ManifestService _manifestService = new();
     private readonly FileVerifier _fileVerifier = new();
     private readonly DownloadService _downloadService = new();
     private readonly PatchApplier _patchApplier = new();
+    private readonly UpdateStateService _stateService = new();
+
 
     public async Task RunAsync(
         string installDir,
@@ -27,13 +37,15 @@ public sealed class UpdateOrchestrator
             Directory.CreateDirectory(Paths.TempDownloadDir);
             Directory.CreateDirectory(Paths.BackupDir);
 
+            await _stateService.RecoverIfPendingAsync(installDir, ct);
+
             progress.Report(new UpdateProgress(UpdateStage.FetchManifest, 2,
-                "Abriendo runas de actualización…", "Descargando manifiesto"));
+                "Comprobando versión…", "Descargando manifiest"));
 
             var manifest = await _manifestService.FetchAsync(ct);
 
             progress.Report(new UpdateProgress(UpdateStage.VerifyFiles, 10,
-                "Escaneando el grimorio…", forceRepair ? "Modo repair: re-verificación completa" : "Verificando archivos locales"));
+                "Verificando archivos…", forceRepair ? "Modo repair: rehash + limpieza" : "Verificación incremental"));
 
             var verifyResult = await _fileVerifier.VerifyAsync(
                 installDir,
@@ -43,13 +55,23 @@ public sealed class UpdateOrchestrator
                 basePercent: 10,
                 spanPercent: 25);
 
+            if (forceRepair)
+            {
+                var removedOrphans = await _fileVerifier.CleanupOrphansAsync(installDir, manifest, RepairWhitelist, ct);
+                if (removedOrphans > 0)
+                {
+                    progress.Report(new UpdateProgress(UpdateStage.VerifyFiles, 34,
+                        "Limpiando archivos huérfanos…", $"Se eliminaron {removedOrphans} archivos no listados en manifest."));
+                }
+            }
+
             var toDownload = verifyResult.MissingOrInvalid;
             var totalBytes = toDownload.Sum(x => Math.Max(0, x.Size));
 
             if (toDownload.Count == 0)
             {
                 progress.Report(new UpdateProgress(UpdateStage.FinalCheck, 98,
-                    "Portal estabilizándose…", "Validación final"));
+                    "Verificando estado final…", "Validación final"));
 
                 await _fileVerifier.QuickCheckAsync(installDir, manifest, ct);
 
@@ -59,8 +81,8 @@ public sealed class UpdateOrchestrator
             }
 
             progress.Report(new UpdateProgress(UpdateStage.Downloading, 35,
-                "Generando plan de actualización…",
-                $"{toDownload.Count} archivos ({FormatBytes(totalBytes)}) por descargar"));
+                "Descargando…",
+                $"Descargando {toDownload.Count} archivos ({FormatBytes(totalBytes)})"));
 
             CleanTempDirectory(Paths.TempDownloadDir);
 
@@ -73,22 +95,35 @@ public sealed class UpdateOrchestrator
                 basePercent: 35,
                 spanPercent: 55);
 
+            await _stateService.BeginAsync(manifest.Version, ct);
+
             progress.Report(new UpdateProgress(UpdateStage.Applying, 90,
-                "Aplicando actualización…", "Realizando reemplazo atómico de archivos"));
+                "Aplicando…", "Realizando reemplazo transaccional"));
 
             await _patchApplier.ApplyAsync(
                 installDir,
                 Paths.BackupDir,
                 readyFiles,
+                _stateService,
                 progress,
                 ct,
                 basePercent: 90,
                 spanPercent: 8);
 
             progress.Report(new UpdateProgress(UpdateStage.FinalCheck, 98,
-                "Alineando coordenadas del Zaap…", "Comprobación final"));
+                 "Verificando…", "Comprobación final"));
 
-            await _fileVerifier.QuickCheckAsync(installDir, manifest, ct);
+            try
+            {
+                await _fileVerifier.QuickCheckAsync(installDir, manifest, ct);
+            }
+            catch
+            {
+                await _stateService.RollbackAsync(installDir, ct);
+                throw;
+            }
+
+            await _stateService.CompleteAsync(ct);
 
             progress.Report(new UpdateProgress(UpdateStage.Ready, 100,
                 "Portal estabilizado. Listo para entrar.", "Todo actualizado"));
@@ -104,9 +139,7 @@ public sealed class UpdateOrchestrator
         catch (Exception ex)
         {
             throw new UpdateFlowException("La actualización falló.", "No se pudieron completar todas las etapas de actualización.", ex);
-
         }
-       
     }
 
     private static string FormatBytes(long bytes)
@@ -120,7 +153,6 @@ public sealed class UpdateOrchestrator
             unitIndex++;
         }
 
-
         return $"{value:0.##} {units[unitIndex]}";
     }
 
@@ -132,5 +164,4 @@ public sealed class UpdateOrchestrator
         foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
             File.Delete(file);
     }
-
 }
