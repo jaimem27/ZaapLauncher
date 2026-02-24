@@ -40,7 +40,7 @@ public sealed class UpdateOrchestrator
             await _stateService.RecoverIfPendingAsync(installDir, ct);
 
             progress.Report(new UpdateProgress(UpdateStage.FetchManifest, 2,
-                "Comprobando versión…", "Descargando manifiest"));
+                "Comprobando versión…", "Descargando manifest"));
 
             var manifest = await _manifestService.FetchAsync(ct);
 

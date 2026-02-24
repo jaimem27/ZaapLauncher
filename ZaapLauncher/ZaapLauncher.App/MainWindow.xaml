@@ -345,8 +345,9 @@
                                     Padding="1"
                                     ClipToBounds="True">
                                 <Border x:Name="PART_Indicator"
-                                        CornerRadius="0"
-                                        HorizontalAlignment="Left">
+                                        CornerRadius="999"
+                                        HorizontalAlignment="Left"
+                                        ClipToBounds="True">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                             <GradientStop Color="#6DE0FF" Offset="0"/>
@@ -354,7 +355,7 @@
                                             <GradientStop Color="#0EA5E9" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Border.Background>
-                                    <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="0" Opacity="0.7"/>
+                                    <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="999" Opacity="0.7"/>
                                 </Border>
 
                             
@@ -634,11 +635,12 @@
 
                         <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
 
-                        <Button Style="{StaticResource HeaderActionButton}"
+                        <Button Style="{StaticResource HeaderIconButton}"
                                 ToolTip="Verifica y repara archivos"
                                 Command="{Binding RepairCommand}"
                                 Margin="0,0,10,0"
-                                Content="Reparar" />
+                                FontSize="18"
+                                Content="🛠️" />
 
                         <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
 
