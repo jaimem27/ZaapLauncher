@@ -3,8 +3,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Media.Animation;
 using ZaapLauncher.App.Class;
+using ZaapLauncher.App.Services;
 using ZaapLauncher.App.ViewModels;
 
 namespace ZaapLauncher.App
@@ -109,9 +113,98 @@ namespace ZaapLauncher.App
 
         private void Discord_Click(object sender, RoutedEventArgs e)
         {
+            OpenDiscordCommunity();
+        }
+
+        private void OpenSettings_Click(object sender, RoutedEventArgs e)
+        {
+            LogsPreviewTextBox.Text = BuildLogsPreview();
+            SettingsModal.Visibility = Visibility.Visible;
+        }
+
+        private void CloseSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsModal.Visibility = Visibility.Collapsed;
+        }
+
+        private void RunRepairFromModal_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.StartUpdate(forceRepair: true);
+            SettingsModal.Visibility = Visibility.Collapsed;
+        }
+
+        private void OpenGameFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Directory.CreateDirectory(Paths.InstallDir);
+
+            var gameExe = Path.Combine(Paths.InstallDir, "Dofus.exe");
+            if (File.Exists(gameExe))
+            {
+                Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{gameExe}\"") { UseShellExecute = true });
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Paths.InstallDir,
+                UseShellExecute = true
+            });
+        }
+
+        private void OpenCommunityDiscord_Click(object sender, RoutedEventArgs e)
+        {
+            OpenDiscordCommunity();
+        }
+
+        private static void OpenDiscordCommunity()
+        {
             var url = "https://discord.gg/eGGu9ZVCG2";
 
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+
+        private static string BuildLogsPreview()
+        {
+            var candidates = new[]
+            {
+                Path.Combine(Paths.InstallDir, "logs"),
+                Path.Combine(Paths.LauncherDataDir, "logs")
+            };
+
+            var latestLog = candidates
+                .Where(Directory.Exists)
+                .SelectMany(path => Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
+                .Where(path => path.EndsWith(".log", StringComparison.OrdinalIgnoreCase)
+                    || path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                .Select(path => new FileInfo(path))
+                .OrderByDescending(file => file.LastWriteTimeUtc)
+                .FirstOrDefault();
+
+            if (latestLog is null)
+            {
+                return "No se encontraron logs en:\n"
+                    + $"- {Path.Combine(Paths.InstallDir, "logs")}\n"
+                    + $"- {Path.Combine(Paths.LauncherDataDir, "logs")}";
+            }
+
+            try
+            {
+                var lines = File.ReadAllLines(latestLog.FullName);
+                var tail = lines.TakeLast(250);
+                var builder = new StringBuilder();
+                builder.AppendLine($"Archivo: {latestLog.FullName}");
+                builder.AppendLine($"Última modificación (UTC): {latestLog.LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss}");
+                builder.AppendLine(new string('-', 72));
+
+                foreach (var line in tail)
+                    builder.AppendLine(line);
+
+                return builder.ToString();
+            }
+            catch (Exception ex)
+            {
+                return $"No se pudo leer el log:\n{latestLog.FullName}\n\n{ex.GetType().Name}: {ex.Message}";
+            }
         }
 
     }
