@@ -2,6 +2,10 @@
 
 Launcher para servidores privados de **Dofus 2.X+**.
 
+
+## ⚠️ Este launcher requiere un servidor web (Apache/IIS/Nginx).
+No funciona usando rutas locales tipo C:\...
+
 Permite:
 
 - 🔄 Descargar y actualizar el cliente automáticamente.
@@ -76,7 +80,7 @@ Explicación:
 
 - `"C:\cliente-dofus"` → carpeta del cliente.
 - `"C:\cliente-dofus\manifest.json"` → aquí se genera el manifest.
-- `"http://IPVPS/game/"` → URL donde estará publicado el cliente.
+- `"http://IPVPS/game/"` → URL BASE donde estarán los archivos (sin manifest.json al final).
 - `"v1.0.0"` → versión (cámbiala en cada update).
 
 Cuando termine tendrás:
@@ -196,56 +200,102 @@ No muevas cosas.
 Entrega la carpeta completa tal cual.
 
 Lo recomendable es comprimir esa carpeta en un `.zip`.
+El launcher NO necesita .NET instalado si usas --self-contained true.
 
 ---
 
-# ⚙ CONFIGURAR EL MANIFEST EN EL PC DEL JUGADOR
+# ⚙ CONFIGURACIÓN RECOMENDADA ANTES DE COMPILAR
 
-En el PC donde se usa el launcher:
+1. Configurar URLs/endpoint en el código.
+2. Compilar.
+3. Entregar ese launcher ya configurado a todos los jugadores.
 
-1. Ve a:
-
-```
-%LocalAppData%\ZaapLauncher\
-```
-
-2. Crea o edita:
-
-```
-settings.json
-```
-
-Ejemplo:
-
-```
-{
-  "manifestUrl": "http://IP_DE_TU_VPS/game/manifest.json",
-  "allowUnsignedManifest": true
-}
-```
-
-Guarda y abre el launcher.
 
 ---
 
-# 🟢 CONFIGURAR ONLINE / OFFLINE
+## Variables que debes cambiar en el código
 
-En la VPS abre PowerShell y ejecuta:
+### 1) URL por defecto del manifest
 
-```
-setx ZAAP_SERVER_ENDPOINT "IPVPS:PUERTO_WORLD"
-```
-
-Ejemplo:
+Archivo:
 
 ```
-setx ZAAP_SERVER_ENDPOINT "123.45.67.89:5555"
+ZaapLauncher/ZaapLauncher.Core/Services/ManifestService.cs
 ```
 
-Reinicia el launcher.
+Variable:
 
-Si el puerto está abierto → Online.  
-Si no → Offline.
+```csharp
+private const string DefaultManifestUrl = "http://127.0.0.1:8080/manifest.json";
+```
+
+Cámbiala por tu URL real, por ejemplo:
+
+```csharp
+private const string DefaultManifestUrl = "http://IP_DE_TU_VPS/game/manifest.json";
+```
+
+---
+
+### 2) Endpoint por defecto para estado Online/Offline
+
+Archivo:
+```
+ZaapLauncher/ZaapLauncher.Core/Services/ServerStatusService.cs
+```
+
+Variable:
+
+```csharp
+private const string DefaultServerEndpoint = "127.0.0.1:444";
+```
+
+Cámbiala por el host:puerto de tu World/Game server, por ejemplo:
+
+```csharp
+private const string DefaultServerEndpoint = "123.45.67.89:5555";
+```
+---
+
+### 3) URL base del manifest para resolver noticias (`news.json`)
+
+Archivo:
+
+```
+ZaapLauncher/ZaapLauncher.Core/Services/NewsService.cs
+```
+
+Variable:
+
+```csharp
+private const string DefaultManifestUrl = "http://127.0.0.1:8080/manifest.json";
+```
+
+Pon la misma URL del manifest de producción para que las noticias apunten al mismo host.
+
+⚠️ Debe coincidir con la URL usada en ManifestService.
+Si no coincide, las noticias pueden no cargarse correctamente.
+
+---
+
+## ¿Y `settings.json` / variables de entorno?
+
+Siguen funcionando, pero ya quedarían como opción avanzada/debug:
+
+- `ZAAP_MANIFEST_URL` puede sobreescribir la URL del manifest.
+- `ZAAP_SERVER_ENDPOINT` puede sobreescribir el endpoint online/offline.
+- `%LocalAppData%\ZaapLauncher\settings.json` también puede sobreescribir manifest y firma.
+
+Si no quieres que los jugadores toquen nada, **simplemente no uses esos overrides** y distribuye el launcher ya compilado con tus valores.
+
+---
+
+# 🟢 ONLINE / OFFLINE (resumen)
+
+El estado se calcula probando conexión TCP al `host:puerto` configurado en `DefaultServerEndpoint`.
+
+- Si responde → Online.
+- Si no responde → Offline.
 
 ---
 
