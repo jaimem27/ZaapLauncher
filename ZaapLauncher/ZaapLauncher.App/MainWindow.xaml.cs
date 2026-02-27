@@ -50,6 +50,8 @@ namespace ZaapLauncher.App
 
         private void HideSplashOverlay()
         {
+            (TryFindResource("VortexLoop") as Storyboard)?.Stop(this);
+
             if (TryFindResource("HideSplash") is not Storyboard storyboard)
             {
                 SplashOverlay.Visibility = Visibility.Collapsed;

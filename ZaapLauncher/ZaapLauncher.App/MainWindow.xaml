@@ -50,26 +50,29 @@
             <DoubleAnimation Storyboard.TargetName="SplashOverlay"
                              Storyboard.TargetProperty="Opacity"
                              To="0"
-                             BeginTime="0:0:0.3"/>
+                             BeginTime="0:0:0.45"
+                             Duration="0:0:0.40"/>
             <DoubleAnimation Storyboard.TargetName="SplashScale"
                              Storyboard.TargetProperty="ScaleX"
-                             To="1.85"
-                             Duration="0:0:0.75">
-                <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseIn" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+                             To="5.0"
+                             Duration="0:0:0.85"
+                             AccelerationRatio="0.25"
+                             DecelerationRatio="0.05" />
             <DoubleAnimation Storyboard.TargetName="SplashScale"
                              Storyboard.TargetProperty="ScaleY"
-                             To="1.85"
-                             Duration="0:0:0.75">
-                <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseIn" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
+                             To="5.0"
+                             Duration="0:0:0.85"
+                             AccelerationRatio="0.25"
+                             DecelerationRatio="0.05" />
             <DoubleAnimation Storyboard.TargetName="MainContent"
                              Storyboard.TargetProperty="Opacity"
                              To="1"
+                             BeginTime="0:0:0.55"
+                             Duration="0:0:0.35" />
+            <DoubleAnimation Storyboard.TargetName="MainBlur"
+                             Storyboard.TargetProperty="Radius"
+                             To="0"
+                             BeginTime="0:0:0.55"
                              Duration="0:0:0.35" />
         </Storyboard>
 
@@ -562,6 +565,9 @@
                 CornerRadius="18"
                 Margin="12"
                 Opacity="0">
+            <Border.Effect>
+                <BlurEffect x:Name="MainBlur" Radius="8" />
+            </Border.Effect>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="56" />
