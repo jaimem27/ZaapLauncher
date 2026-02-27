@@ -5,7 +5,6 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Media.Animation;
 using ZaapLauncher.App.Class;
 using ZaapLauncher.App.Services;
@@ -118,8 +117,12 @@ namespace ZaapLauncher.App
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            LogsPreviewTextBox.Text = BuildLogsPreview();
+            LogsSummaryTextBlock.Text = BuildLogsSummary();
             SettingsModal.Visibility = Visibility.Visible;
+            SettingsModal.Opacity = 0;
+
+            if (TryFindResource("ShowSettingsModal") is Storyboard storyboard)
+                storyboard.Begin(this);
         }
 
         private void CloseSettings_Click(object sender, RoutedEventArgs e)
@@ -151,6 +154,25 @@ namespace ZaapLauncher.App
             });
         }
 
+        private void OpenLogsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var logsFolders = new[]
+            {
+                Path.Combine(Paths.InstallDir, "logs"),
+                Path.Combine(Paths.LauncherDataDir, "logs")
+            };
+
+            var existingFolder = logsFolders.FirstOrDefault(Directory.Exists);
+            var targetFolder = existingFolder ?? logsFolders[0];
+            Directory.CreateDirectory(targetFolder);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = targetFolder,
+                UseShellExecute = true
+            });
+        }
+
         private void OpenCommunityDiscord_Click(object sender, RoutedEventArgs e)
         {
             OpenDiscordCommunity();
@@ -158,12 +180,12 @@ namespace ZaapLauncher.App
 
         private static void OpenDiscordCommunity()
         {
-            var url = "https://discord.gg/eGGu9ZVCG2";
+            var url = "https://discord.gg/8DAhv7tvxt";
 
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
-        private static string BuildLogsPreview()
+        private static string BuildLogsSummary()
         {
             var candidates = new[]
             {
@@ -181,29 +203,15 @@ namespace ZaapLauncher.App
                 .FirstOrDefault();
 
             if (latestLog is null)
-            {
-                return "No se encontraron logs en:\n"
-                    + $"- {Path.Combine(Paths.InstallDir, "logs")}\n"
-                    + $"- {Path.Combine(Paths.LauncherDataDir, "logs")}";
-            }
+                return "No se encontraron logs.";
 
             try
             {
-                var lines = File.ReadAllLines(latestLog.FullName);
-                var tail = lines.TakeLast(250);
-                var builder = new StringBuilder();
-                builder.AppendLine($"Archivo: {latestLog.FullName}");
-                builder.AppendLine($"Última modificación (UTC): {latestLog.LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss}");
-                builder.AppendLine(new string('-', 72));
-
-                foreach (var line in tail)
-                    builder.AppendLine(line);
-
-                return builder.ToString();
+                return $"Último log detectado: {latestLog.LastWriteTime:yyyy-MM-dd HH:mm}";
             }
-            catch (Exception ex)
+            catch
             {
-                return $"No se pudo leer el log:\n{latestLog.FullName}\n\n{ex.GetType().Name}: {ex.Message}";
+                return "No se pudieron leer los logs.";
             }
         }
 

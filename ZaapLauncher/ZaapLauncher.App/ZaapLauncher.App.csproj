@@ -13,6 +13,7 @@
   <ItemGroup>
     <None Remove="Assets\icon.jpg" />
     <None Remove="Assets\icon.png" />
+    <None Remove="Assets\icons\ajustes.png" />
     <None Remove="Assets\icons\close.png" />
     <None Remove="Assets\icons\discord.png" />
     <None Remove="Assets\icons\minimize.png" />
@@ -27,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\icons\ajustes.png" />
     <Resource Include="Assets\icons\close.png" />
     <Resource Include="Assets\icons\discord.png" />
     <Resource Include="Assets\icons\minimize.png" />
