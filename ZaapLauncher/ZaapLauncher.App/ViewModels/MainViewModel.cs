@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -77,6 +78,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly Random _random = new();
     private readonly LauncherLogService _logger = new();
     private readonly NewsService _newsService = new();
+    private const string ServerEndpoint = "localhost:444"; //Cambiar al servidor
+    private readonly ServerStatusService _serverStatusService = new();
+    private readonly CancellationTokenSource _serverStatusMonitorCts = new();
+    private bool? _lastServerOnlineState;
 
     private static readonly string[] FlavorTexts =
     [
@@ -119,6 +124,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         CancelUpdateCommand = new RelayCommand(_ => _updateCts?.Cancel(), _ => _updateCts is not null);
 
         _ = LoadNewsAsync();
+        _ = MonitorServerStatusAsync(_serverStatusMonitorCts.Token);
         _ = StartUpdateAsync(forceRepair: false);
     }
 
@@ -170,10 +176,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
             SetPatchProgressTarget(100);
             SetState(LauncherState.Ready);
-            ServerStatusText = "Online";
-            ServerStatusColor = Brushes.MediumSeaGreen;
-            OnPropertyChanged(nameof(ServerStatusText));
-            OnPropertyChanged(nameof(ServerStatusColor));
+            await RefreshServerStatusAsync();
             await _logger.LogInfoAsync("Updater", "Actualización completada correctamente.");
         }
         catch (OperationCanceledException)
@@ -206,6 +209,75 @@ public sealed class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
             await _logger.LogErrorAsync("Updater", "Error inesperado durante el flujo de actualización.", ex);
+        }
+    }
+
+    private async Task MonitorServerStatusAsync(CancellationToken ct)
+    {
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                if (IsReadyToPlay)
+                    await RefreshServerStatusAsync(ct);
+
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // no-op
+        }
+    }
+
+    private async Task RefreshServerStatusAsync(CancellationToken ct = default)
+    {
+        var snapshot = await _serverStatusService.GetStatusAsync(ct);
+
+        ServerStatusText = snapshot.IsOnline ? "Online" : "Offline";
+        ServerStatusColor = snapshot.IsOnline ? Brushes.MediumSeaGreen : Brushes.IndianRed;
+        OnPropertyChanged(nameof(ServerStatusText));
+        OnPropertyChanged(nameof(ServerStatusColor));
+
+        if (_lastServerOnlineState != snapshot.IsOnline)
+        {
+            _lastServerOnlineState = snapshot.IsOnline;
+            await _logger.LogInfoAsync("ServerStatus",
+                $"Endpoint {snapshot.Endpoint}: {(snapshot.IsOnline ? "abierto" : "cerrado")} ({snapshot.Detail}).");
+        }
+    }
+
+    private async Task RefreshServerStatusAsync()
+    {
+        var isOnline = await IsEndpointOpenAsync(ServerEndpoint, TimeSpan.FromSeconds(2));
+        ServerStatusText = isOnline ? "Online" : "Offline";
+        ServerStatusColor = isOnline ? Brushes.MediumSeaGreen : Brushes.IndianRed;
+        OnPropertyChanged(nameof(ServerStatusText));
+        OnPropertyChanged(nameof(ServerStatusColor));
+
+        var endpointStatus = isOnline ? "abierto" : "cerrado";
+        await _logger.LogInfoAsync("ServerStatus", $"Endpoint {ServerEndpoint} {endpointStatus}.");
+    }
+
+    private static async Task<bool> IsEndpointOpenAsync(string endpoint, TimeSpan timeout)
+    {
+        if (string.IsNullOrWhiteSpace(endpoint))
+            return false;
+
+        var parts = endpoint.Split(':', 2, StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 || !int.TryParse(parts[1], out var port) || port < 1 || port > 65535)
+            return false;
+
+        try
+        {
+            using var tcpClient = new TcpClient();
+            using var cts = new CancellationTokenSource(timeout);
+            await tcpClient.ConnectAsync(parts[0], port, cts.Token);
+            return tcpClient.Connected;
+        }
+        catch
+        {
+            return false;
         }
     }
 
