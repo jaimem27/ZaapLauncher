@@ -26,6 +26,21 @@
                              Duration="0:0:3.5" />
         </Storyboard>
 
+        <Storyboard x:Key="HideSplash">
+            <DoubleAnimation Storyboard.TargetName="SplashOverlay"
+                             Storyboard.TargetProperty="Opacity"
+                             To="0"
+                             Duration="0:0:0.45" />
+            <DoubleAnimation Storyboard.TargetName="SplashScale"
+                             Storyboard.TargetProperty="ScaleX"
+                             To="1.03"
+                             Duration="0:0:0.45" />
+            <DoubleAnimation Storyboard.TargetName="SplashScale"
+                             Storyboard.TargetProperty="ScaleY"
+                             To="1.03"
+                             Duration="0:0:0.45" />
+        </Storyboard>
+        
         <!-- Header typography -->
         <Style x:Key="HeaderTitleStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="/Fonts/#Exo 2" />
@@ -509,215 +524,216 @@
         </EventTrigger>
     </Window.Triggers>
 
-    <Border Background="#0B1220" CornerRadius="18" Margin="12">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="56" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <Grid x:Name="Root">
+        <Border Background="#0B1220" CornerRadius="18" Margin="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="56" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <!-- Header container (rounded) -->
-            <Border Grid.Row="0"
+                <!-- Header container (rounded) -->
+                <Border Grid.Row="0"
                     CornerRadius="16,16,0,0"
                     ClipToBounds="True"
                     Background="#111B2E"
                     MouseLeftButtonDown="Header_MouseLeftButtonDown">
 
-                <Grid Height="56" SnapsToDevicePixels="True">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                    <Grid Height="56" SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Bottom subtle line -->
-                    <Border VerticalAlignment="Bottom" Height="1" Opacity="0.55" IsHitTestVisible="False">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#001C2E50" Offset="0" />
-                                <GradientStop Color="#402AA8FF" Offset="0.5" />
-                                <GradientStop Color="#001C2E50" Offset="1" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
+                        <!-- Bottom subtle line -->
+                        <Border VerticalAlignment="Bottom" Height="1" Opacity="0.55" IsHitTestVisible="False">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#001C2E50" Offset="0" />
+                                    <GradientStop Color="#402AA8FF" Offset="0.5" />
+                                    <GradientStop Color="#001C2E50" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
 
-                    <!-- Left: icon + title -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,8,0,0">
+                        <!-- Left: icon + title -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,8,0,0">
 
-                        <Grid Width="42" Height="42" Margin="0,0,12,0">
-                            <Ellipse Fill="#0E1A2F" />
-                            <Ellipse Opacity="0.45">
-                                <Ellipse.Effect>
-                                    <DropShadowEffect Color="#38BDF8"
+                            <Grid Width="42" Height="42" Margin="0,0,12,0">
+                                <Ellipse Fill="#0E1A2F" />
+                                <Ellipse Opacity="0.45">
+                                    <Ellipse.Effect>
+                                        <DropShadowEffect Color="#38BDF8"
                                                       BlurRadius="18"
                                                       ShadowDepth="0"
                                                       Opacity="0.35"/>
-                                </Ellipse.Effect>
-                            </Ellipse>
+                                    </Ellipse.Effect>
+                                </Ellipse>
 
-                            <Image Source="/Assets/icon.png"
+                                <Image Source="/Assets/icon.png"
                                    Width="78"
                                    Height="54"
                                    Stretch="Uniform"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top"
                                    Margin="0,-3,0,0" />
-                        </Grid>
+                            </Grid>
 
-                        <StackPanel Orientation="Vertical" Margin="0,2,0,0">
+                            <StackPanel Orientation="Vertical" Margin="0,2,0,0">
 
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource HeaderTitleStyle}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource HeaderTitleStyle}">
                                     <Run Text="Zaap" Foreground="#8FD3FF" />
                                     <Run Text=" Launcher" />
-                                </TextBlock>
+                                    </TextBlock>
 
-                                <!-- Version chip (outline) -->
-                                <Border CornerRadius="999"
+                                    <!-- Version chip (outline) -->
+                                    <Border CornerRadius="999"
                                         Padding="8,3"
                                         Margin="10,2,0,0"
                                         Background="#00000000"
                                         BorderBrush="#1F2E52"
                                         BorderThickness="1"
                                         Opacity="0.9">
-                                    <TextBlock Text="{Binding LauncherVersion}"
+                                        <TextBlock Text="{Binding LauncherVersion}"
                                                Foreground="#BFD6FF"
                                                FontSize="10.5"
                                                FontWeight="SemiBold"
                                                FontFamily="Segoe UI Variable" />
-                                </Border>
-                            </StackPanel>
+                                    </Border>
+                                </StackPanel>
 
-                            <TextBlock Text="Abriendo el portal al Mundo de los Doce…"
+                                <TextBlock Text="Abriendo el portal al Mundo de los Doce…"
                                        Style="{StaticResource HeaderSubtitleStyle}"
                                        Margin="0,2,0,0" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
 
-                    <!-- Right: status + actions -->
-                    <StackPanel Grid.Column="1"
+                        <!-- Right: status + actions -->
+                        <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center"
                                 Margin="0,0,14,0">
 
-                        <!-- Status pill -->
-                        <Border CornerRadius="999"
+                            <!-- Status pill -->
+                            <Border CornerRadius="999"
                                 Padding="12,7"
                                 Margin="0,0,8,0"
                                 BorderThickness="1"
                                 BorderBrush="#1F2E52">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                    <GradientStop Color="#0F1C34" Offset="0" />
-                                    <GradientStop Color="#0B162B" Offset="1" />
-                                </LinearGradientBrush>
-                            </Border.Background>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#0F1C34" Offset="0" />
+                                        <GradientStop Color="#0B162B" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
 
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Ellipse Width="8" Height="8" Margin="0,0,8,0" Fill="{Binding ServerStatusColor}" />
-                                <TextBlock Text="{Binding ServerStatusText}"
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Ellipse Width="8" Height="8" Margin="0,0,8,0" Fill="{Binding ServerStatusColor}" />
+                                    <TextBlock Text="{Binding ServerStatusText}"
                                            Foreground="#D7E3FF"
                                            FontSize="12"
                                            FontWeight="SemiBold"
                                            FontFamily="Segoe UI Variable" />
-                            </StackPanel>
-                        </Border>
+                                </StackPanel>
+                            </Border>
 
-                        <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
+                            <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
 
-                        <Button Style="{StaticResource HeaderIconButton}"
+                            <Button Style="{StaticResource HeaderIconButton}"
                                 ToolTip="Verifica y repara archivos"
                                 Command="{Binding RepairCommand}"
                                 Margin="0,0,10,0"
                                 FontSize="18"
                                 Content="🛠️" />
 
-                        <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
+                            <Border Width="1" Height="20" Background="#1F2E52" Opacity="0.33" Margin="0,0,10,0" />
 
-                        <!-- Discord -->
-                        <Button Style="{StaticResource HeaderIconButton}"
+                            <!-- Discord -->
+                            <Button Style="{StaticResource HeaderIconButton}"
                                 ToolTip="Únete a Discord"
                                 Click="Discord_Click"
                                 Margin="0,0,8,0">
-                            <Image Source="/Assets/Icons/discord.png"
+                                <Image Source="/Assets/Icons/discord.png"
                                    Width="22" Height="22"
                                    Stretch="Uniform"
                                    SnapsToDevicePixels="True"
                                    RenderOptions.BitmapScalingMode="HighQuality" />
-                        </Button>
+                            </Button>
 
-                        <!-- Minimize -->
-                        <Button Style="{StaticResource HeaderIconButton}"
+                            <!-- Minimize -->
+                            <Button Style="{StaticResource HeaderIconButton}"
                                 ToolTip="Minimizar"
                                 Click="Minimize_Click"
                                 Margin="0,0,8,0">
-                            <Image Source="/Assets/Icons/minimize.png"
+                                <Image Source="/Assets/Icons/minimize.png"
                                    Width="18" Height="18"
                                    Stretch="Uniform"
                                    SnapsToDevicePixels="True"
                                    RenderOptions.BitmapScalingMode="HighQuality" />
-                        </Button>
+                            </Button>
 
-                        <!-- Close -->
-                        <Button Style="{StaticResource HeaderCloseButton}"
+                            <!-- Close -->
+                            <Button Style="{StaticResource HeaderCloseButton}"
                                 ToolTip="Cerrar"
                                 Click="Close_Click">
-                            <Image Source="/Assets/Icons/close.png"
+                                <Image Source="/Assets/Icons/close.png"
                                    Width="18" Height="18"
                                    Stretch="Uniform"
                                    SnapsToDevicePixels="True"
                                    RenderOptions.BitmapScalingMode="HighQuality" />
-                        </Button>
+                            </Button>
 
-                    </StackPanel>
+                        </StackPanel>
 
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
 
-            <!-- Body -->
-            <Grid Grid.Row="1" Margin="16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="340" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                <!-- Body -->
+                <Grid Grid.Row="1" Margin="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="340" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <!-- Left: News -->
-                <Border Background="#0E1A2F"
+                    <!-- Left: News -->
+                    <Border Background="#0E1A2F"
                         CornerRadius="16"
                         Padding="20,18,20,20"
                         Opacity="0.95" Margin="-16,0,0,0">
 
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                        <TextBlock Text="Noticias" Style="{StaticResource NewsHeaderTitle}" />
+                            <TextBlock Text="Noticias" Style="{StaticResource NewsHeaderTitle}" />
 
-                        <ScrollViewer Grid.Row="1"
+                            <ScrollViewer Grid.Row="1"
                                       Margin="0,12,0,0"
                                       VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled"
                                       Style="{StaticResource NewsScrollViewerStyle}">
 
-                            <ItemsControl ItemsSource="{Binding NewsItems}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#0B162B"
+                                <ItemsControl ItemsSource="{Binding NewsItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#0B162B"
                                                 CornerRadius="12"
                                                 Padding="12"
                                                 Margin="0,0,0,14"
                                                 BorderThickness="1"
                                                 BorderBrush="#132443">
 
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="72" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="72" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
 
-                                                <!-- Image -->
-                                                <Border Grid.Column="0"
+                                                    <!-- Image -->
+                                                    <Border Grid.Column="0"
                                                         Width="64"
                                                         Height="64"
                                                         CornerRadius="12"
@@ -726,39 +742,39 @@
                                                         BorderBrush="#132443"
                                                         SnapsToDevicePixels="True"
                                                         VerticalAlignment="Top">
-                                                    <Grid ClipToBounds="True">
-                                                        <Image Source="{Binding ImageSource}"
+                                                        <Grid ClipToBounds="True">
+                                                            <Image Source="{Binding ImageSource}"
                                                                Stretch="UniformToFill"
                                                                HorizontalAlignment="Center"
                                                                VerticalAlignment="Center"
                                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                                SnapsToDevicePixels="True" />
-                                                    </Grid>
-                                                </Border>
+                                                        </Grid>
+                                                    </Border>
 
-                                                <!-- Content -->
-                                                <Grid Grid.Column="1">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
+                                                    <!-- Content -->
+                                                    <Grid Grid.Column="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
 
-                                                    <!-- Title + tag -->
-                                                    <Grid Grid.Row="0" Margin="0,0,0,2">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
+                                                        <!-- Title + tag -->
+                                                        <Grid Grid.Row="0" Margin="0,0,0,2">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
 
-                                                        <TextBlock Grid.Column="0"
+                                                            <TextBlock Grid.Column="0"
                                                                    Text="{Binding Title}"
                                                                    Style="{StaticResource NewsCardTitle}"
                                                                    TextTrimming="CharacterEllipsis"
                                                                    Margin="0,0,10,0"/>
 
-                                                        <Border Grid.Column="1"
+                                                            <Border Grid.Column="1"
                                                                 CornerRadius="999"
                                                                 Padding="8,2"
                                                                 Background="#00000000"
@@ -766,27 +782,27 @@
                                                                 BorderBrush="#1F2E52"
                                                                 Opacity="0.95"
                                                                 VerticalAlignment="Center">
-                                                            <TextBlock Text="{Binding Tag}"
+                                                                <TextBlock Text="{Binding Tag}"
                                                                        Foreground="#BFD6FF"
                                                                        FontSize="10"
                                                                        FontWeight="SemiBold"
                                                                        FontFamily="Segoe UI Variable Text"/>
-                                                        </Border>
-                                                    </Grid>
+                                                            </Border>
+                                                        </Grid>
 
-                                                    <!-- Date -->
-                                                    <TextBlock Grid.Row="1"
+                                                        <!-- Date -->
+                                                        <TextBlock Grid.Row="1"
                                                                Text="{Binding DateText}"
                                                                Style="{StaticResource NewsCardMeta}"
                                                                Margin="0,0,0,6"/>
 
-                                                    <!-- Body -->
-                                                    <TextBlock Grid.Row="2"
+                                                        <!-- Body -->
+                                                        <TextBlock Grid.Row="2"
                                                                Text="{Binding Body}"
                                                                Style="{StaticResource NewsCardBody}"/>
 
-                                                    <!-- Link -->
-                                                    <TextBlock Grid.Row="3"
+                                                        <!-- Link -->
+                                                        <TextBlock Grid.Row="3"
                                                                Text="Leer más →"
                                                                Foreground="#8FD3FF"
                                                                FontSize="11.5"
@@ -794,35 +810,35 @@
                                                                Cursor="Hand"
                                                                Visibility="{Binding HasLink}"
                                                                MouseLeftButtonUp="NewsLink_Click"/>
+                                                    </Grid>
+
                                                 </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
 
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
-
-                <!-- Right -->
-                <Border Grid.Column="1"
+                    <!-- Right -->
+                    <Border Grid.Column="1"
                         Background="#0E1A2F"
                         CornerRadius="16"
                         Padding="16"
                         Margin="16,0,-16,0"
                         Opacity="0.90">
 
-                    <Grid>
-                        <!-- Portal area -->
-                        <Grid HorizontalAlignment="Center"
+                        <Grid>
+                            <!-- Portal area -->
+                            <Grid HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Width="540"
                               Height="420">
 
-                            <!-- HALO GRANDE -->
-                            <Ellipse Width="520"
+                                <!-- HALO GRANDE -->
+                                <Ellipse Width="520"
                                      Height="520"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Top"
@@ -831,38 +847,38 @@
                                      IsHitTestVisible="False"
                                      RenderTransformOrigin="0.5,0.5"
                                      Panel.ZIndex="15">
-                                <Ellipse.RenderTransform>
-                                    <ScaleTransform ScaleX="1" ScaleY="1" />
-                                </Ellipse.RenderTransform>
+                                    <Ellipse.RenderTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </Ellipse.RenderTransform>
 
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
-                                        <GradientStop Color="#4038BDF8" Offset="0" />
-                                        <GradientStop Color="#0038BDF8" Offset="1" />
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
+                                            <GradientStop Color="#4038BDF8" Offset="0" />
+                                            <GradientStop Color="#0038BDF8" Offset="1" />
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
 
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                  From="0.12" To="0.22"
                                                                  Duration="0:0:3.4" />
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                                                  From="0.99" To="1.03"
                                                                  Duration="0:0:3.4" />
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                                                  From="0.99" To="1.03"
                                                                  Duration="0:0:3.4" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
 
-                            <!-- HALO PEQUEÑO -->
-                            <Ellipse Width="360"
+                                <!-- HALO PEQUEÑO -->
+                                <Ellipse Width="360"
                                      Height="340"
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Top"
@@ -871,50 +887,50 @@
                                      IsHitTestVisible="False"
                                      RenderTransformOrigin="0.5,0.5"
                                      Panel.ZIndex="20">
-                                <Ellipse.RenderTransform>
-                                    <ScaleTransform ScaleX="1" ScaleY="1" />
-                                </Ellipse.RenderTransform>
+                                    <Ellipse.RenderTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </Ellipse.RenderTransform>
 
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
-                                        <GradientStop Color="#8038BDF8" Offset="0" />
-                                        <GradientStop Color="#0038BDF8" Offset="1" />
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.55" RadiusY="0.55">
+                                            <GradientStop Color="#8038BDF8" Offset="0" />
+                                            <GradientStop Color="#0038BDF8" Offset="1" />
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
 
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                  From="0.32" To="0.52"
                                                                  Duration="0:0:2.7" />
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                                                  From="0.98" To="1.05"
                                                                  Duration="0:0:2.7" />
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                                                  From="0.98" To="1.05"
                                                                  Duration="0:0:2.7" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
 
-                            <!-- Portal frame -->
-                            <Border CornerRadius="18"
+                                <!-- Portal frame -->
+                                <Border CornerRadius="18"
                                     ClipToBounds="True"
                                     Width="540"
                                     Height="360"
                                     Panel.ZIndex="10">
-                                <Grid>
-                                    <Image x:Name="PortalBaseImage"
+                                    <Grid>
+                                        <Image x:Name="PortalBaseImage"
                                            Source="/Assets/portal.jpg"
                                            Stretch="UniformToFill"
                                            Opacity="0.88"
                                            Margin="-88,0,-52,0" />
 
-                                    <Ellipse x:Name="VortexEllipse"
+                                        <Ellipse x:Name="VortexEllipse"
                                              Width="299"
                                              Height="284"
                                              HorizontalAlignment="Left"
@@ -923,122 +939,122 @@
                                              Opacity="0.26"
                                              RenderOptions.BitmapScalingMode="Fant"
                                              IsHitTestVisible="False">
-                                        <Ellipse.RenderTransform>
-                                            <RotateTransform Angle="0" CenterX="149.5" CenterY="142" />
-                                        </Ellipse.RenderTransform>
-                                        
-                                        <Ellipse.Fill>
-                                            <ImageBrush ImageSource="/Assets/vortex.png"
+                                            <Ellipse.RenderTransform>
+                                                <RotateTransform Angle="0" CenterX="149.5" CenterY="142" />
+                                            </Ellipse.RenderTransform>
+
+                                            <Ellipse.Fill>
+                                                <ImageBrush ImageSource="/Assets/vortex.png"
                                                         Stretch="Uniform"
                                                         AlignmentX="Center"
                                                         AlignmentY="Center">
-                                            </ImageBrush>
-                                        </Ellipse.Fill>
+                                                </ImageBrush>
+                                            </Ellipse.Fill>
 
-                                        <Ellipse.Triggers>
-                                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard RepeatBehavior="Forever">
-                                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                            <Ellipse.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
                                                                          From="0"
                                                                          To="360"
-                                                                         Duration="0:0:10" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Ellipse.Triggers>
+                                                                         Duration="0:0:05" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Ellipse.Triggers>
 
-                                    </Ellipse>
+                                        </Ellipse>
 
-                                    <!-- Perimeter edge fade -->
-                                    <Grid IsHitTestVisible="False" Panel.ZIndex="60">
+                                        <!-- Perimeter edge fade -->
+                                        <Grid IsHitTestVisible="False" Panel.ZIndex="60">
 
-                                        <!-- Top -->
-                                        <Rectangle VerticalAlignment="Top" Height="80">
+                                            <!-- Top -->
+                                            <Rectangle VerticalAlignment="Top" Height="80">
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                        <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <!-- Bottom -->
+                                            <Rectangle VerticalAlignment="Bottom" Height="90">
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                                        <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                        <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <!-- Left -->
+                                            <Rectangle HorizontalAlignment="Left" Width="90">
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                        <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <!-- Right -->
+                                            <Rectangle HorizontalAlignment="Right" Width="90">
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                                                        <GradientStop Color="#B30E1A2F" Offset="0"/>
+                                                        <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                        </Grid>
+
+                                        <!-- Bottom fade -->
+                                        <Rectangle VerticalAlignment="Bottom" Height="140" IsHitTestVisible="False">
                                             <Rectangle.Fill>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
-                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
+                                                    <GradientStop Color="#00000000" Offset="0" />
+                                                    <GradientStop Color="#0E1A2F" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Rectangle.Fill>
                                         </Rectangle>
-
-                                        <!-- Bottom -->
-                                        <Rectangle VerticalAlignment="Bottom" Height="90">
-                                            <Rectangle.Fill>
-                                                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
-                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-
-                                        <!-- Left -->
-                                        <Rectangle HorizontalAlignment="Left" Width="90">
-                                            <Rectangle.Fill>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
-                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-
-                                        <!-- Right -->
-                                        <Rectangle HorizontalAlignment="Right" Width="90">
-                                            <Rectangle.Fill>
-                                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
-                                                    <GradientStop Color="#B30E1A2F" Offset="0"/>
-                                                    <GradientStop Color="#000E1A2F" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-
                                     </Grid>
+                                </Border>
 
-                                    <!-- Bottom fade -->
-                                    <Rectangle VerticalAlignment="Bottom" Height="140" IsHitTestVisible="False">
-                                        <Rectangle.Fill>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="#00000000" Offset="0" />
-                                                <GradientStop Color="#0E1A2F" Offset="1" />
-                                            </LinearGradientBrush>
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                </Grid>
-                            </Border>
-
-                            <!-- Dark circle -->
-                            <Ellipse Margin="129,125,162,52"
+                                <!-- Dark circle -->
+                                <Ellipse Margin="129,125,162,52"
                                      Opacity="1"
                                      Panel.ZIndex="30">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush Center="0.5,0.5"
+                                    <Ellipse.Fill>
+                                        <RadialGradientBrush Center="0.5,0.5"
                                                          GradientOrigin="0.5,0.5"
                                                          RadiusX="0.60"
                                                          RadiusY="0.60">
-                                        <GradientStop Color="#E60B1220" Offset="0" />
-                                        <GradientStop Color="#800B1220" Offset="0.45" />
-                                        <GradientStop Color="#000B1220" Offset="1" />
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
+                                            <GradientStop Color="#E60B1220" Offset="0" />
+                                            <GradientStop Color="#800B1220" Offset="0.45" />
+                                            <GradientStop Color="#000B1220" Offset="1" />
+                                        </RadialGradientBrush>
+                                    </Ellipse.Fill>
+                                </Ellipse>
 
-                            <!-- PLAY + PROGRESO + ESTADO -->
-                            <Canvas Panel.ZIndex="45">
+                                <!-- PLAY + PROGRESO + ESTADO -->
+                                <Canvas Panel.ZIndex="45">
 
-                                <!-- PLAY (habilitado al 100%) -->
-                                <Button Style="{StaticResource PlayButtonStyleReady}"
+                                    <!-- PLAY (habilitado al 100%) -->
+                                    <Button Style="{StaticResource PlayButtonStyleReady}"
                                         IsEnabled="{Binding IsReadyToPlay}"
                                         Command="{Binding PlayCommand}"
                                         Canvas.Left="158"
                                         Canvas.Top="250"
                                         Height="54"
                                         Width="189">
-                                    <TextBlock Text="PLAY" />
-                                </Button>
+                                        <TextBlock Text="PLAY" />
+                                    </Button>
 
-                                <!-- HALO detrás de la barra -->
-                                <Ellipse Canvas.Left="1"
+                                    <!-- HALO detrás de la barra -->
+                                    <Ellipse Canvas.Left="1"
                                          Canvas.Top="353"
                                          Width="539"
                                          Height="25"
@@ -1047,30 +1063,30 @@
                                          Panel.ZIndex="1"
                                          HorizontalAlignment="Left"
                                          VerticalAlignment="Center">
-                                    <Ellipse.Fill>
-                                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.60" RadiusY="0.55">
-                                            <GradientStop Color="#8038BDF8" Offset="0"/>
-                                            <GradientStop Color="#0038BDF8" Offset="1"/>
-                                        </RadialGradientBrush>
-                                    </Ellipse.Fill>
-                                    <Ellipse.Effect>
-                                        <BlurEffect Radius="18"/>
-                                    </Ellipse.Effect>
-                                    <Ellipse.Triggers>
-                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                        <Ellipse.Fill>
+                                            <RadialGradientBrush Center="0.5,0.5" RadiusX="0.60" RadiusY="0.55">
+                                                <GradientStop Color="#8038BDF8" Offset="0"/>
+                                                <GradientStop Color="#0038BDF8" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Ellipse.Fill>
+                                        <Ellipse.Effect>
+                                            <BlurEffect Radius="18"/>
+                                        </Ellipse.Effect>
+                                        <Ellipse.Triggers>
+                                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                      From="0.10" To="0.20"
                                                                      Duration="0:0:2.8"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Ellipse.Triggers>
-                                </Ellipse>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Ellipse.Triggers>
+                                    </Ellipse>
 
-                                <!-- Soft glow horizontal detrás de la barra -->
-                                <Rectangle Canvas.Left="-21"
+                                    <!-- Soft glow horizontal detrás de la barra -->
+                                    <Rectangle Canvas.Left="-21"
                                            Canvas.Top="346"
                                            Width="582"
                                            Height="37"
@@ -1081,22 +1097,22 @@
                                            Panel.ZIndex="1"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Top">
-                                    <Rectangle.Fill>
-                                        <RadialGradientBrush Center="0.5,0.5"
+                                        <Rectangle.Fill>
+                                            <RadialGradientBrush Center="0.5,0.5"
                                                              RadiusX="0.9"
                                                              RadiusY="0.5">
-                                            <GradientStop Color="#8038BDF8" Offset="0"/>
-                                            <GradientStop Color="#0038BDF8" Offset="1"/>
-                                        </RadialGradientBrush>
-                                    </Rectangle.Fill>
+                                                <GradientStop Color="#8038BDF8" Offset="0"/>
+                                                <GradientStop Color="#0038BDF8" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Rectangle.Fill>
 
-                                    <Rectangle.Effect>
-                                        <BlurEffect Radius="18"/>
-                                    </Rectangle.Effect>
-                                </Rectangle>
+                                        <Rectangle.Effect>
+                                            <BlurEffect Radius="18"/>
+                                        </Rectangle.Effect>
+                                    </Rectangle>
 
-                                <!-- Barra (baja opacidad cuando IsReadyToPlay=true) -->
-                                <ProgressBar x:Name="ProgressBarMain"
+                                    <!-- Barra (baja opacidad cuando IsReadyToPlay=true) -->
+                                    <ProgressBar x:Name="ProgressBarMain"
              Canvas.Top="353"
              Width="540"
              Minimum="0"
@@ -1107,29 +1123,29 @@
              VerticalAlignment="Center"
              Height="22"
              RenderTransformOrigin="0.5,0.5">
-                                    <ProgressBar.RenderTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform/>
-                                            <SkewTransform/>
-                                            <RotateTransform Angle="-0.008"/>
-                                            <TranslateTransform/>
-                                        </TransformGroup>
-                                    </ProgressBar.RenderTransform>
+                                        <ProgressBar.RenderTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform/>
+                                                <SkewTransform/>
+                                                <RotateTransform Angle="-0.008"/>
+                                                <TranslateTransform/>
+                                            </TransformGroup>
+                                        </ProgressBar.RenderTransform>
 
-                                    <!-- Un solo Style (basado en el tuyo) -->
-                                    <ProgressBar.Style>
-                                        <Style TargetType="ProgressBar" BasedOn="{StaticResource ProgressPillStyle}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
-                                                    <Setter Property="Opacity" Value="0.55"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ProgressBar.Style>
-                                </ProgressBar>
+                                        <!-- Un solo Style (basado en el tuyo) -->
+                                        <ProgressBar.Style>
+                                            <Style TargetType="ProgressBar" BasedOn="{StaticResource ProgressPillStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                        <Setter Property="Opacity" Value="0.55"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ProgressBar.Style>
+                                    </ProgressBar>
 
-                                <!-- % centrado debajo de la barra -->
-                                <TextBlock Text="{Binding PatchProgress, StringFormat={}{0:0}%}"
+                                    <!-- % centrado debajo de la barra -->
+                                    <TextBlock Text="{Binding PatchProgress, StringFormat={}{0:0}%}"
                                            Canvas.Left="-18"
                                            Canvas.Top="383"
                                            Width="540"
@@ -1140,8 +1156,8 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
 
-                                <!-- Frase grande graciosa (NO listo) -->
-                                <TextBlock Text="{Binding StatusHeadline}"
+                                    <!-- Frase grande graciosa (NO listo) -->
+                                    <TextBlock Text="{Binding StatusHeadline}"
                                            Canvas.Left="42"
                                            Canvas.Top="406"
                                            Width="420"
@@ -1153,20 +1169,20 @@
                                            TextWrapping="Wrap"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                                <!-- Frase grande (LISTO) -->
-                                <TextBlock Text="Portal estabilizado. Listo para entrar."
+                                    <!-- Frase grande (LISTO) -->
+                                    <TextBlock Text="Portal estabilizado. Listo para entrar."
                                            Canvas.Left="42"
                                            Canvas.Top="406"
                                            Width="420"
@@ -1178,20 +1194,20 @@
                                            TextWrapping="Wrap"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                                <!-- Detalle pequeño técnico (NO listo) -->
-                                <TextBlock Text="{Binding StatusDetail}"
+                                    <!-- Detalle pequeño técnico (NO listo) -->
+                                    <TextBlock Text="{Binding StatusDetail}"
                                            Canvas.Left="42"
                                            Canvas.Top="431"
                                            Width="420"
@@ -1202,20 +1218,20 @@
                                            TextWrapping="Wrap"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                                <!-- Detalle pequeño (LISTO) -->
-                                <TextBlock Text="Todo actualizado. Buen viaje, aventurero."
+                                    <!-- Detalle pequeño (LISTO) -->
+                                    <TextBlock Text="Todo actualizado. Buen viaje, aventurero."
                                            Canvas.Left="42"
                                            Canvas.Top="431"
                                            Width="420"
@@ -1226,24 +1242,64 @@
                                            TextWrapping="Wrap"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsReadyToPlay}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                            </Canvas>
+                                </Canvas>
 
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Border>
+                    </Border>
+                </Grid>
             </Grid>
+        </Border>
+
+        <Grid x:Name="SplashOverlay"
+              Panel.ZIndex="999"
+              Background="#CC0B1220"
+              Opacity="1"
+              Visibility="Visible"
+              IsHitTestVisible="True">
+            <Grid.RenderTransform>
+                <ScaleTransform x:Name="SplashScale"
+                                ScaleX="1"
+                                ScaleY="1" />
+            </Grid.RenderTransform>
+
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="420">
+                <TextBlock Text="ZaapLauncher"
+                           FontSize="34"
+                           FontWeight="SemiBold"
+                           Foreground="White"
+                           HorizontalAlignment="Center" />
+
+                <TextBlock Text="Inicializando..."
+                           Margin="0,10,0,0"
+                           FontSize="14"
+                           Foreground="#BFFFFFFF"
+                           HorizontalAlignment="Center" />
+
+                <ProgressBar Margin="0,22,0,0"
+                             Height="10"
+                             IsIndeterminate="True" />
+
+                <TextBlock Margin="0,14,0,0"
+                           Text="Cargando interfaz y verificando archivos…"
+                           FontSize="12"
+                           Foreground="#80FFFFFF"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
         </Grid>
-    </Border>
+    </Grid>
 </Window>

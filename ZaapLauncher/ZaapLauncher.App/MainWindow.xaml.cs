@@ -21,13 +21,51 @@ namespace ZaapLauncher.App
             ViewModel = new MainViewModel();
 
             DataContext = ViewModel;
+            Loaded += MainWindow_Loaded;
 
-            Loaded += (_, __) =>
+
+        }
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            var minSplashDuration = TimeSpan.FromMilliseconds(2500);
+            var start = Stopwatch.StartNew();
+
+            await WaitForInitialPhaseAsync();
+
+            var remaining = minSplashDuration - start.Elapsed;
+            if (remaining > TimeSpan.Zero)
+                await Task.Delay(remaining);
+
+            HideSplashOverlay();
+        }
+
+        private async Task WaitForInitialPhaseAsync()
+        {
+            var maxWait = TimeSpan.FromSeconds(8);
+            var waitStart = Stopwatch.StartNew();
+
+            while (ViewModel.StatusHeadline == "Inicializando…" && waitStart.Elapsed < maxWait)
+                await Task.Delay(120);
+        }
+
+        private void HideSplashOverlay()
+        {
+            if (TryFindResource("HideSplash") is not Storyboard storyboard)
             {
-                ((Storyboard)FindResource("PortalBreath")).Begin();
-                
-            };           
+                SplashOverlay.Visibility = Visibility.Collapsed;
+                SplashOverlay.IsHitTestVisible = false;
+                return;
+            }
 
+            void OnCompleted(object? _, EventArgs __)
+            {
+                storyboard.Completed -= OnCompleted;
+                SplashOverlay.Visibility = Visibility.Collapsed;
+                SplashOverlay.IsHitTestVisible = false;
+            }
+
+            storyboard.Completed += OnCompleted;
+            storyboard.Begin(this);
         }
 
         private void NewsLink_Click(object sender, MouseButtonEventArgs e)

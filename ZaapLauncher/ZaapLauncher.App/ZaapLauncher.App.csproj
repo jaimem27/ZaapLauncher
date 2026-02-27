@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <PackageIcon>logo.png</PackageIcon>
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +16,6 @@
     <None Remove="Assets\icons\close.png" />
     <None Remove="Assets\icons\discord.png" />
     <None Remove="Assets\icons\minimize.png" />
-    <None Remove="Assets\logo.png" />
     <None Remove="Assets\news\images\launch.jpg" />
     <None Remove="Assets\news\images\x2exp.jpg" />
     <None Remove="Assets\news\news.json" />
@@ -31,6 +32,7 @@
     <Resource Include="Assets\icons\minimize.png" />
     <Resource Include="Assets\news\images\launch.jpg" />
     <Resource Include="Assets\news\images\x2exp.jpg" />
+    <Resource Include="Assets\logo.ico" />
     <Content Include="Assets\news\news.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -48,6 +50,13 @@
     <Resource Include="Assets\vortex.png" />
     <Resource Include="Fonts\Exo2-Bold.ttf" />
     <Resource Include="Fonts\Exo2-SemiBold.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
