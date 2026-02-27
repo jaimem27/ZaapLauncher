@@ -22,6 +22,7 @@ public sealed class UpdateOrchestrator
     private readonly DownloadService _downloadService = new();
     private readonly PatchApplier _patchApplier = new();
     private readonly UpdateStateService _stateService = new();
+    private readonly InstallStateService _installStateService = new();
 
 
     public async Task RunAsync(
@@ -53,7 +54,9 @@ public sealed class UpdateOrchestrator
                 progress,
                 ct,
                 basePercent: 10,
-                spanPercent: 25);
+                spanPercent: 25,
+                forceStrongVerification: forceRepair);
+
 
             if (forceRepair)
             {
@@ -73,7 +76,8 @@ public sealed class UpdateOrchestrator
                 progress.Report(new UpdateProgress(UpdateStage.FinalCheck, 98,
                     "Verificando estado final…", "Validación final"));
 
-                await _fileVerifier.QuickCheckAsync(installDir, manifest, ct);
+                await _fileVerifier.QuickCheckAsync(installDir, manifest, ct, includeHashChecks: false);
+                await _installStateService.MarkVerifiedAsync(manifest.Version, verifyResult.VerifiedFiles, ct);
 
                 progress.Report(new UpdateProgress(UpdateStage.Ready, 100,
                     "Portal estabilizado.", "Listo para entrar"));
@@ -115,7 +119,24 @@ public sealed class UpdateOrchestrator
 
             try
             {
-                await _fileVerifier.QuickCheckAsync(installDir, manifest, ct);
+                await _fileVerifier.QuickCheckAsync(installDir, manifest, ct, includeHashChecks: true);
+
+                var installedFiles = manifest.Files.ToDictionary(
+                    x => x.Path.Replace('\\', '/'),
+                    x =>
+                    {
+                        var fullPath = Path.Combine(installDir, x.Path);
+                        var info = new FileInfo(fullPath);
+                        return new InstallFileState
+                        {
+                            Size = info.Length,
+                            LastWriteTimeUtcTicks = info.LastWriteTimeUtc.Ticks,
+                            Sha256 = x.Sha256
+                        };
+                    },
+                    StringComparer.OrdinalIgnoreCase);
+
+                await _installStateService.MarkVerifiedAsync(manifest.Version, installedFiles, ct);
             }
             catch
             {

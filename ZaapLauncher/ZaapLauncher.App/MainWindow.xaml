@@ -26,14 +26,6 @@
                              Duration="0:0:3.5" />
         </Storyboard>
 
-        <!-- Vortex rotate (brush) -->
-        <Storyboard x:Key="VortexBrushRotate" RepeatBehavior="Forever">
-            <DoubleAnimation Storyboard.TargetName="VortexBrush"
-                             Storyboard.TargetProperty="(Brush.RelativeTransform).(RotateTransform.Angle)"
-                             From="0" To="360"
-                             Duration="0:0:10" />
-        </Storyboard>
-
         <!-- Header typography -->
         <Style x:Key="HeaderTitleStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="/Fonts/#Exo 2" />
@@ -515,9 +507,6 @@
         <EventTrigger RoutedEvent="Window.Loaded">
             <BeginStoryboard Storyboard="{StaticResource PortalBreath}" />
         </EventTrigger>
-        <EventTrigger RoutedEvent="Window.Loaded">
-            <BeginStoryboard Storyboard="{StaticResource VortexBrushRotate}" />
-        </EventTrigger>
     </Window.Triggers>
 
     <Border Background="#0B1220" CornerRadius="18" Margin="12">
@@ -925,7 +914,8 @@
                                            Opacity="0.88"
                                            Margin="-88,0,-52,0" />
 
-                                    <Ellipse Width="299"
+                                    <Ellipse x:Name="VortexEllipse"
+                                             Width="299"
                                              Height="284"
                                              HorizontalAlignment="Left"
                                              VerticalAlignment="Top"
@@ -933,17 +923,31 @@
                                              Opacity="0.26"
                                              RenderOptions.BitmapScalingMode="Fant"
                                              IsHitTestVisible="False">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="0" CenterX="149.5" CenterY="142" />
+                                        </Ellipse.RenderTransform>
+                                        
                                         <Ellipse.Fill>
-                                            <ImageBrush x:Name="VortexBrush"
-                                                        ImageSource="/Assets/vortex.png"
+                                            <ImageBrush ImageSource="/Assets/vortex.png"
                                                         Stretch="Uniform"
                                                         AlignmentX="Center"
                                                         AlignmentY="Center">
-                                                <ImageBrush.RelativeTransform>
-                                                    <RotateTransform Angle="0" CenterX="0.5" CenterY="0.5" />
-                                                </ImageBrush.RelativeTransform>
                                             </ImageBrush>
                                         </Ellipse.Fill>
+
+                                        <Ellipse.Triggers>
+                                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                                         From="0"
+                                                                         To="360"
+                                                                         Duration="0:0:10" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Ellipse.Triggers>
+
                                     </Ellipse>
 
                                     <!-- Perimeter edge fade -->

@@ -25,8 +25,7 @@ namespace ZaapLauncher.App
             Loaded += (_, __) =>
             {
                 ((Storyboard)FindResource("PortalBreath")).Begin();
-                ((Storyboard)FindResource("VortexBrushRotate")).Begin();
-
+                
             };           
 
         }

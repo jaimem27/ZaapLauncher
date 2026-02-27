@@ -11,22 +11,32 @@ namespace ZaapLauncher.App.Services;
 public sealed class VerifyResult
 {
     public List<ManifestFile> MissingOrInvalid { get; } = new();
+    public Dictionary<string, InstallFileState> VerifiedFiles { get; } = new(StringComparer.OrdinalIgnoreCase);
 }
 
 public sealed class FileVerifier
 {
+    private readonly InstallStateService _installStateService = new();
+
     public Task<VerifyResult> VerifyAsync(
         string installDir,
         Manifest manifest,
         IProgress<UpdateProgress> progress,
         CancellationToken ct,
         double basePercent,
-        double spanPercent)
+        double spanPercent,
+        bool forceStrongVerification)
     {
         return Task.Run(() =>
         {
             var result = new VerifyResult();
             var total = manifest.Files.Count;
+            var installState = _installStateService.LoadAsync(ct).GetAwaiter().GetResult();
+            var hasTrustedManifestState =
+                !forceStrongVerification &&
+                installState is not null &&
+                string.Equals(installState.ManifestVersion, manifest.Version, StringComparison.OrdinalIgnoreCase) &&
+                Directory.Exists(installDir);
 
             if (total == 0)
             {
@@ -42,21 +52,47 @@ public sealed class FileVerifier
 
                 var fullPath = Path.Combine(installDir, file.Path);
                 var ok = File.Exists(fullPath);
+                FileInfo? info = null;
 
                 if (ok && file.Size > 0)
                 {
-                    var info = new FileInfo(fullPath);
+                    info = new FileInfo(fullPath);
                     ok = info.Length == file.Size;
                 }
 
                 if (ok && !string.IsNullOrWhiteSpace(file.Sha256))
                 {
-                    var localHash = Sha256File(fullPath, ct);
-                    ok = string.Equals(localHash, file.Sha256, StringComparison.OrdinalIgnoreCase);
+                    info ??= new FileInfo(fullPath);
+                    var relativePath = Normalize(file.Path);
+
+                    var hasReusableFingerprint =
+                        installState?.Files.TryGetValue(relativePath, out var cached) == true &&
+                        cached.Size == info.Length &&
+                        cached.LastWriteTimeUtcTicks == info.LastWriteTimeUtc.Ticks &&
+                        string.Equals(cached.Sha256, file.Sha256, StringComparison.OrdinalIgnoreCase);
+
+                    var mustHash = forceStrongVerification || (!hasTrustedManifestState && !hasReusableFingerprint);
+                    if (mustHash)
+                    {
+                        var localHash = Sha256File(fullPath, ct);
+                        ok = string.Equals(localHash, file.Sha256, StringComparison.OrdinalIgnoreCase);
+                    }
                 }
 
                 if (!ok)
+                {
                     result.MissingOrInvalid.Add(file);
+                }
+                else
+                {
+                    info ??= new FileInfo(fullPath);
+                    result.VerifiedFiles[Normalize(file.Path)] = new InstallFileState
+                    {
+                        Size = info.Length,
+                        LastWriteTimeUtcTicks = info.LastWriteTimeUtc.Ticks,
+                        Sha256 = file.Sha256
+                    };
+                }
 
                 done++;
                 var percent = basePercent + (spanPercent * done / (double)total);
@@ -68,8 +104,40 @@ public sealed class FileVerifier
         }, ct);
     }
 
-    public async Task QuickCheckAsync(string installDir, Manifest manifest, CancellationToken ct)
+    public async Task QuickCheckAsync(string installDir, Manifest manifest, CancellationToken ct, bool includeHashChecks = true)
     {
+        if (includeHashChecks)
+        {
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = ct,
+                MaxDegreeOfParallelism = 3
+            };
+
+            await Parallel.ForEachAsync(manifest.Files, parallelOptions, async (file, token) =>
+            {
+                var fullPath = Path.Combine(installDir, file.Path);
+                if (!File.Exists(fullPath))
+                    throw new UpdateFlowException("Comprobación final fallida.", $"No se encontró {file.Path} tras actualizar.");
+
+                if (file.Size > 0)
+                {
+                    var info = new FileInfo(fullPath);
+                    if (info.Length != file.Size)
+                        throw new UpdateFlowException("Comprobación final fallida.", $"Tamaño inesperado en {file.Path}.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(file.Sha256))
+                {
+                    var hash = await Sha256FileAsync(fullPath, token);
+                    if (!string.Equals(hash, file.Sha256, StringComparison.OrdinalIgnoreCase))
+                        throw new UpdateFlowException("Comprobación final fallida.", $"Hash inválido en {file.Path}.");
+                }
+            });
+
+            return;
+        }
+
         foreach (var file in manifest.Files)
         {
             ct.ThrowIfCancellationRequested();
@@ -83,13 +151,6 @@ public sealed class FileVerifier
                 var info = new FileInfo(fullPath);
                 if (info.Length != file.Size)
                     throw new UpdateFlowException("Comprobación final fallida.", $"Tamaño inesperado en {file.Path}.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(file.Sha256))
-            {
-                var hash = await Sha256FileAsync(fullPath, ct);
-                if (!string.Equals(hash, file.Sha256, StringComparison.OrdinalIgnoreCase))
-                    throw new UpdateFlowException("Comprobación final fallida.", $"Hash inválido en {file.Path}.");
             }
         }
     }
@@ -137,7 +198,8 @@ public sealed class FileVerifier
 
     public static async Task<string> Sha256FileAsync(string path, CancellationToken ct)
     {
-        await using var stream = File.OpenRead(path);
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
+            bufferSize: 256 * 1024, FileOptions.Asynchronous | FileOptions.SequentialScan);
         using var sha = SHA256.Create();
         var hash = await sha.ComputeHashAsync(stream, ct);
         return Convert.ToHexString(hash).ToLowerInvariant();
@@ -145,7 +207,8 @@ public sealed class FileVerifier
 
     private static string Sha256File(string path, CancellationToken ct)
     {
-        using var stream = File.OpenRead(path);
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,
+            bufferSize: 256 * 1024, FileOptions.SequentialScan);
         using var sha = SHA256.Create();
         var hash = sha.ComputeHash(stream);
         ct.ThrowIfCancellationRequested();
