@@ -26,21 +26,53 @@
                              Duration="0:0:3.5" />
         </Storyboard>
 
+        <Storyboard x:Key="VortexLoop" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="SplashVortexRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0"
+                             To="360"
+                             Duration="0:0:6" />
+            <DoubleAnimation Storyboard.TargetName="SplashVortexScale"
+                             Storyboard.TargetProperty="ScaleX"
+                             From="1.04"
+                             To="1.08"
+                             Duration="0:0:1.6"
+                             AutoReverse="True" />
+            <DoubleAnimation Storyboard.TargetName="SplashVortexScale"
+                             Storyboard.TargetProperty="ScaleY"
+                             From="1.04"
+                             To="1.08"
+                             Duration="0:0:1.6"
+                             AutoReverse="True" />
+        </Storyboard>
+
         <Storyboard x:Key="HideSplash">
             <DoubleAnimation Storyboard.TargetName="SplashOverlay"
                              Storyboard.TargetProperty="Opacity"
                              To="0"
-                             Duration="0:0:0.45" />
+                             BeginTime="0:0:0.3"/>
             <DoubleAnimation Storyboard.TargetName="SplashScale"
                              Storyboard.TargetProperty="ScaleX"
-                             To="1.03"
-                             Duration="0:0:0.45" />
+                             To="1.85"
+                             Duration="0:0:0.75">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetName="SplashScale"
                              Storyboard.TargetProperty="ScaleY"
-                             To="1.03"
-                             Duration="0:0:0.45" />
+                             To="1.85"
+                             Duration="0:0:0.75">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseIn" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="MainContent"
+                             Storyboard.TargetProperty="Opacity"
+                             To="1"
+                             Duration="0:0:0.35" />
         </Storyboard>
-        
+
         <!-- Header typography -->
         <Style x:Key="HeaderTitleStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="/Fonts/#Exo 2" />
@@ -186,7 +218,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!-- PLAY button style -->
         <Style x:Key="PlayButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="210" />
@@ -365,7 +397,7 @@
                                     <Border BorderBrush="#96E9FF" BorderThickness="0,1,0,0" CornerRadius="999" Opacity="0.7"/>
                                 </Border>
 
-                            
+
                             </Border>
 
                             <!-- Sheen -->
@@ -525,7 +557,11 @@
     </Window.Triggers>
 
     <Grid x:Name="Root">
-        <Border Background="#0B1220" CornerRadius="18" Margin="12">
+        <Border x:Name="MainContent"
+                Background="#0B1220"
+                CornerRadius="18"
+                Margin="12"
+                Opacity="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="56" />
@@ -1265,40 +1301,74 @@
 
         <Grid x:Name="SplashOverlay"
               Panel.ZIndex="999"
-              Background="#CC0B1220"
+              Background="#05070C"
               Opacity="1"
               Visibility="Visible"
-              IsHitTestVisible="True">
+              IsHitTestVisible="True"
+              RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <ScaleTransform x:Name="SplashScale"
                                 ScaleX="1"
                                 ScaleY="1" />
             </Grid.RenderTransform>
 
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource VortexLoop}" />
+                </EventTrigger>
+            </Grid.Triggers>
+
+            <Grid x:Name="PortalHost"
+                  Width="900"
+                  Height="600"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Image Source="/Assets/portal.jpg"
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="HighQuality" />
+
+                <Grid x:Name="VortexLayer"
+                      Width="386"
+                      Height="360"
+                      Opacity="0.25"
+                      Panel.ZIndex="2"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      RenderTransformOrigin="0.5,0.5">
+
+                    <Grid.Clip>
+                        <EllipseGeometry Center="180,180" RadiusX="180" RadiusY="180" />
+                    </Grid.Clip>
+
+
+                    <Grid.OpacityMask>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#FFFFFFFF" Offset="0.0" />
+                            <GradientStop Color="#CCFFFFFF" Offset="0.55" />
+                            <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                        </RadialGradientBrush>
+                    </Grid.OpacityMask>
+
+                    <Image x:Name="SplashVortex"
+                           Source="/Assets/vortex.png"
+                           Stretch="Uniform"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           RenderTransformOrigin="0.5,0.5" Margin="0,1,-7,-54">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform x:Name="SplashVortexScale" ScaleX="1.06" ScaleY="1.06" />
+                                <RotateTransform x:Name="SplashVortexRotate" Angle="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
+            </Grid>
+
+            <Rectangle Fill="#55050A16" />
+
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Width="420">
-                <TextBlock Text="ZaapLauncher"
-                           FontSize="34"
-                           FontWeight="SemiBold"
-                           Foreground="White"
-                           HorizontalAlignment="Center" />
-
-                <TextBlock Text="Inicializando..."
-                           Margin="0,10,0,0"
-                           FontSize="14"
-                           Foreground="#BFFFFFFF"
-                           HorizontalAlignment="Center" />
-
-                <ProgressBar Margin="0,22,0,0"
-                             Height="10"
-                             IsIndeterminate="True" />
-
-                <TextBlock Margin="0,14,0,0"
-                           Text="Cargando interfaz y verificando archivos…"
-                           FontSize="12"
-                           Foreground="#80FFFFFF"
-                           HorizontalAlignment="Center" />
             </StackPanel>
         </Grid>
     </Grid>
