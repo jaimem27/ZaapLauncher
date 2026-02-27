@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using ZaapLauncher.App.Models;
+using ZaapLauncher.Core.Models;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public sealed record DownloadedFile(ManifestFile ManifestFile, string ReadyPath);
 

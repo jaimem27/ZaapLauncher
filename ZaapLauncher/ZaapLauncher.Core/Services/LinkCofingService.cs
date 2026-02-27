@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public static class LinkConfigService
 {

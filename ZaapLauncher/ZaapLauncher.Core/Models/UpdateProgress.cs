@@ -1,4 +1,4 @@
-﻿namespace ZaapLauncher.App.Models;
+﻿namespace ZaapLauncher.Core.Models;
 
 public enum UpdateStage
 {

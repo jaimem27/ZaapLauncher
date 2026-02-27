@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public sealed class LauncherLogService
 {

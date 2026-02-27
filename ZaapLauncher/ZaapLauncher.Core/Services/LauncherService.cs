@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public sealed class LauncherService
 {

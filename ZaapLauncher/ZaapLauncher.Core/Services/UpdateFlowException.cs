@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public sealed class UpdateFlowException : Exception
 {

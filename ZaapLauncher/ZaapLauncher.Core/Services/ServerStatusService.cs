@@ -3,13 +3,13 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public readonly record struct ServerStatusSnapshot(string Endpoint, bool IsOnline, string Detail);
 
 public sealed class ServerStatusService
 {
-    private const string DefaultServerEndpoint = "localhost:444";
+    private const string DefaultServerEndpoint = "127.0.0.1:444";
     private readonly TimeSpan _timeout;
 
     public ServerStatusService(string? endpoint = null, TimeSpan? timeout = null)

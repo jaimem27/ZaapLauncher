@@ -3,9 +3,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using ZaapLauncher.App.Models;
+using ZaapLauncher.Core.Models;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public static class ManifestSignatureVerifier
 {

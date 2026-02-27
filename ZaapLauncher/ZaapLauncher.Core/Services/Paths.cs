@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ZaapLauncher.App.Services;
+namespace ZaapLauncher.Core.Services;
 
 public static class Paths
 {

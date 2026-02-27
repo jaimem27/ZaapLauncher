@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ZaapLauncher.App.Models;
+namespace ZaapLauncher.Core.Models;
 
 public sealed class Manifest
 {

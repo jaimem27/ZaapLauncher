@@ -6,8 +6,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Animation;
-using ZaapLauncher.App.Class;
-using ZaapLauncher.App.Services;
+using ZaapLauncher.Core.Models;
+using ZaapLauncher.Core.Services;
 using ZaapLauncher.App.ViewModels;
 
 namespace ZaapLauncher.App

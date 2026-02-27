@@ -3,14 +3,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using ZaapLauncher.App.Class;
-using ZaapLauncher.App.Models;
-using ZaapLauncher.App.Services;
+using ZaapLauncher.Core.Models;
+using ZaapLauncher.Core.Services;
+using ZaapLauncher.App.ViewModels;
 
 namespace ZaapLauncher.App.ViewModels;
 
@@ -28,7 +25,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public ObservableCollection<NewsItem> NewsItems { get; } = new();
+    public ObservableCollection<NewsItemVm> NewsItems { get; } = new();
 
     private double _patchProgress;
     private double _targetPatchProgress;
@@ -78,10 +75,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly Random _random = new();
     private readonly LauncherLogService _logger = new();
     private readonly NewsService _newsService = new();
-    private const string ServerEndpoint = "localhost:444"; //Cambiar al servidor
     private readonly ServerStatusService _serverStatusService = new();
     private readonly CancellationTokenSource _serverStatusMonitorCts = new();
     private bool? _lastServerOnlineState;
+
+    public string ServerStatusEndpoint => _serverStatusService.Endpoint;
 
     private static readonly string[] FlavorTexts =
     [
@@ -176,7 +174,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
             SetPatchProgressTarget(100);
             SetState(LauncherState.Ready);
-            await RefreshServerStatusAsync();
+            await RefreshServerStatusAsync(_updateCts.Token);
             await _logger.LogInfoAsync("Updater", "Actualización completada correctamente.");
         }
         catch (OperationCanceledException)
@@ -244,40 +242,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
             _lastServerOnlineState = snapshot.IsOnline;
             await _logger.LogInfoAsync("ServerStatus",
                 $"Endpoint {snapshot.Endpoint}: {(snapshot.IsOnline ? "abierto" : "cerrado")} ({snapshot.Detail}).");
-        }
-    }
-
-    private async Task RefreshServerStatusAsync()
-    {
-        var isOnline = await IsEndpointOpenAsync(ServerEndpoint, TimeSpan.FromSeconds(2));
-        ServerStatusText = isOnline ? "Online" : "Offline";
-        ServerStatusColor = isOnline ? Brushes.MediumSeaGreen : Brushes.IndianRed;
-        OnPropertyChanged(nameof(ServerStatusText));
-        OnPropertyChanged(nameof(ServerStatusColor));
-
-        var endpointStatus = isOnline ? "abierto" : "cerrado";
-        await _logger.LogInfoAsync("ServerStatus", $"Endpoint {ServerEndpoint} {endpointStatus}.");
-    }
-
-    private static async Task<bool> IsEndpointOpenAsync(string endpoint, TimeSpan timeout)
-    {
-        if (string.IsNullOrWhiteSpace(endpoint))
-            return false;
-
-        var parts = endpoint.Split(':', 2, StringSplitOptions.TrimEntries);
-        if (parts.Length != 2 || !int.TryParse(parts[1], out var port) || port < 1 || port > 65535)
-            return false;
-
-        try
-        {
-            using var tcpClient = new TcpClient();
-            using var cts = new CancellationTokenSource(timeout);
-            await tcpClient.ConnectAsync(parts[0], port, cts.Token);
-            return tcpClient.Connected;
-        }
-        catch
-        {
-            return false;
         }
     }
 
@@ -393,14 +357,28 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         try
         {
+            // OJO: idealmente FetchAsync debería recibir la URL (newsUrl),
+            // pero lo dejo como lo tienes ahora.
             var root = await _newsService.FetchAsync(CancellationToken.None);
 
             NewsItems.Clear();
+
             if (root?.Items is null)
                 return;
 
             foreach (var item in root.Items)
-                NewsItems.Add(item);
+            {
+                NewsItems.Add(new NewsItemVm
+                {
+                    Id = item.Id,
+                    Date = item.Date,
+                    Title = item.Title,
+                    Tag = item.Tag,
+                    Body = item.Body,
+                    Image = item.Image,
+                    Link = item.Link
+                });
+            }
         }
         catch
         {
