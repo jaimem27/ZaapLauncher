@@ -967,6 +967,7 @@
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="72" />
+                                                        <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
 
@@ -990,8 +991,15 @@
                                                         </Grid>
                                                     </Border>
 
+                                                    <Border Grid.Column="1"
+                                                            Width="1"
+                                                            Margin="4,2,10,2"
+                                                            Background="#1F2E52"
+                                                            Opacity="0.85"
+                                                            VerticalAlignment="Stretch" />
+                                                    
                                                     <!-- Content -->
-                                                    <Grid Grid.Column="1">
+                                                    <Grid Grid.Column="2">
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto" />
                                                             <RowDefinition Height="Auto" />

@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -77,6 +76,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly LauncherService _launcher = new();
     private readonly Random _random = new();
     private readonly LauncherLogService _logger = new();
+    private readonly NewsService _newsService = new();
 
     private static readonly string[] FlavorTexts =
     [
@@ -118,7 +118,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         RepairCommand = new RelayCommand(_ => StartUpdate(forceRepair: true));
         CancelUpdateCommand = new RelayCommand(_ => _updateCts?.Cancel(), _ => _updateCts is not null);
 
-        LoadNewsFromDisk();
+        _ = LoadNewsAsync();
         _ = StartUpdateAsync(forceRepair: false);
     }
 
@@ -317,21 +317,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _launcher.Launch(gameExe);
     }
 
-    private void LoadNewsFromDisk()
+    private async Task LoadNewsAsync()
     {
         try
         {
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var path = Path.Combine(baseDir, "Assets", "news", "news.json");
-
-            if (!File.Exists(path))
-                return;
-
-            var json = File.ReadAllText(path);
-            var root = JsonSerializer.Deserialize<NewsRoot>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var root = await _newsService.FetchAsync(CancellationToken.None);
 
             NewsItems.Clear();
             if (root?.Items is null)
