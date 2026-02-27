@@ -62,7 +62,7 @@ public sealed class DownloadService
                     UpdateStage.Downloading,
                     percent,
                     "Cargando kamas al transportista…",
-                    $"Recibiendo datos… ({i + 1}/{files.Count})"));
+                    $"Descargando {i + 1} / {files.Count}... {FormatBytes(beforeFileBytes + read)} / {FormatBytes(totalBytes)}"));
             }, ct);
 
             downloadedBytes = beforeFileBytes + bytesWritten;
@@ -221,6 +221,20 @@ public sealed class DownloadService
     }
 
     private static double Clamp01(double value) => Math.Min(1d, Math.Max(0d, value));
+
+    private static string FormatBytes(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB"];
+        double value = Math.Max(0, bytes);
+        var unitIndex = 0;
+        while (value >= 1024 && unitIndex < units.Length - 1)
+        {
+            value /= 1024;
+            unitIndex++;
+        }
+
+        return $"{value:0.##} {units[unitIndex]}";
+    }
 
     private static string BuildUrl(string manifestBaseUrl, string relativePath)
     {

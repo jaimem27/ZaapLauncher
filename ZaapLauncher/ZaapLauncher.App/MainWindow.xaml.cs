@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.ComponentModel;
 using System.Windows.Media.Animation;
 using ZaapLauncher.App.Class;
 using ZaapLauncher.App.ViewModels;
@@ -23,7 +24,7 @@ namespace ZaapLauncher.App
             DataContext = ViewModel;
             Loaded += MainWindow_Loaded;
 
-
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -37,6 +38,18 @@ namespace ZaapLauncher.App
                 await Task.Delay(remaining);
 
             HideSplashOverlay();
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (!string.Equals(e.PropertyName, nameof(MainViewModel.IsReadyToPlay), StringComparison.Ordinal))
+                return;
+
+            if (!ViewModel.IsReadyToPlay)
+                return;
+
+            if (TryFindResource("PlayReadyGlowPulse") is Storyboard readyFx)
+                readyFx.Begin(this);
         }
 
         private async Task WaitForInitialPhaseAsync()

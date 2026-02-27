@@ -16,6 +16,16 @@ namespace ZaapLauncher.App.ViewModels;
 
 public sealed class MainViewModel : INotifyPropertyChanged
 {
+    public enum LauncherState
+    {
+        Initializing,
+        Checking,
+        Downloading,
+        Repairing,
+        Ready,
+        Error
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ObservableCollection<NewsItem> NewsItems { get; } = new();
@@ -65,6 +75,39 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private readonly UpdateOrchestrator _updater = new();
     private readonly LauncherService _launcher = new();
+    private readonly Random _random = new();
+
+    private static readonly string[] FlavorTexts =
+    [
+        "Sobornando al Anutrof…",
+        "Negociando con el mercader de Astrub…",
+        "Ajustando impuestos en Bonta…",
+        "Recuperando kamas perdidas…",
+        "Alimentando a los tofus…",
+        "Persiguiendo tofus fugitivos…",
+        "Calmando jalatós nerviosos…",
+        "Despertando al Dragopavo…",
+        "Estabilizando el Zaap…",
+        "Alineando runas arcanas…",
+        "Reforzando el anillo rúnico…",
+        "Canalizando energía dimensional…",
+        "Sellando grietas temporales…",
+        "Invocando el portal…",
+        "Compilando hechizos…",
+        "Invocando servidores…",
+        "Encantando archivos…",
+        "Reparando el grimorio…",
+        "Purificando datos corruptos…",
+        "Reordenando los planos astrales…",
+        "Consultando al Xelor…",
+        "Esperando que el Sram deje de esconderse…",
+        "Convenciendo al Zurcarák de cooperar…",
+        "Pidiéndole permiso al Feca…",
+        "Ajustando el destino con Ecaflip…",
+        "Despertando al Yopuka…"
+    ];
+
+    private string? _lastFlavorText;
 
     private CancellationTokenSource? _updateCts;
 
@@ -91,24 +134,31 @@ public sealed class MainViewModel : INotifyPropertyChanged
         ServerStatusColor = Brushes.Gold;
         OnPropertyChanged(nameof(ServerStatusText));
         OnPropertyChanged(nameof(ServerStatusColor));
+        SetState(LauncherState.Initializing, "Preparando actualización...");
 
         SetPatchProgressTarget(0);
 
         var progress = new Progress<UpdateProgress>(p =>
         {
             SetPatchProgressTarget(p.Percent);
-            StatusHeadline = p.Headline;
-            StatusDetail = p.Detail;
+            var state = p.Stage switch
+            {
+                UpdateStage.FetchManifest or UpdateStage.VerifyFiles or UpdateStage.FinalCheck => LauncherState.Checking,
+                UpdateStage.Downloading => LauncherState.Downloading,
+                UpdateStage.Applying => LauncherState.Repairing,
+                UpdateStage.Ready => LauncherState.Ready,
+                _ => LauncherState.Checking
+            };
+
+            SetState(state, p.Detail);
         });
 
         try
         {
             await _updater.RunAsync(Paths.InstallDir, forceRepair, progress, _updateCts.Token);
 
-            StatusHeadline = "Portal estabilizado. Listo para entrar.";
-            StatusDetail = "Todo actualizado. Buen viaje, aventurero.";
             SetPatchProgressTarget(100);
-            IsReadyToPlay = true;
+            SetState(LauncherState.Ready);
             ServerStatusText = "Online";
             ServerStatusColor = Brushes.MediumSeaGreen;
             OnPropertyChanged(nameof(ServerStatusText));
@@ -116,8 +166,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (OperationCanceledException)
         {
+            SetState(LauncherState.Error, "Puedes reanudar cuando quieras.");
             StatusHeadline = "Actualización cancelada.";
-            StatusDetail = "Puedes reanudar cuando quieras.";
             ServerStatusText = "Paused";
             ServerStatusColor = Brushes.Orange;
             OnPropertyChanged(nameof(ServerStatusText));
@@ -125,10 +175,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (UpdateFlowException ex)
         {
+            SetState(LauncherState.Error, ex.Detail);
             StatusHeadline = ex.Headline;
-            StatusDetail = ex.Detail;
             SetPatchProgressTarget(Math.Min(PatchProgress, 98));
-            IsReadyToPlay = false;
             ServerStatusText = "Error";
             ServerStatusColor = Brushes.OrangeRed;
             OnPropertyChanged(nameof(ServerStatusText));
@@ -136,14 +185,65 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
+            SetState(LauncherState.Error, $"{ex.GetType().Name}: {ex.Message}");
             StatusHeadline = "Ha ocurrido un error en el portal.";
-            StatusDetail = $"{ex.GetType().Name}: {ex.Message}";
-            IsReadyToPlay = false;
             ServerStatusText = "Offline";
             ServerStatusColor = Brushes.IndianRed;
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
         }
+    }
+
+    private void SetState(LauncherState state, string detail = "")
+    {
+        switch (state)
+        {
+            case LauncherState.Initializing:
+                StatusHeadline = GetRandomFlavorText();
+                StatusDetail = string.IsNullOrWhiteSpace(detail) ? "Preparando launcher." : detail;
+                IsReadyToPlay = false;
+                break;
+            case LauncherState.Checking:
+                StatusHeadline = GetRandomFlavorText();
+                StatusDetail = string.IsNullOrWhiteSpace(detail) ? "Verificando archivos..." : detail;
+                IsReadyToPlay = false;
+                break;
+            case LauncherState.Downloading:
+                StatusHeadline = GetRandomFlavorText();
+                StatusDetail = string.IsNullOrWhiteSpace(detail) ? "Descargando recursos..." : detail;
+                IsReadyToPlay = false;
+                break;
+            case LauncherState.Repairing:
+                StatusHeadline = GetRandomFlavorText();
+                StatusDetail = string.IsNullOrWhiteSpace(detail) ? "Aplicando reparación..." : detail;
+                IsReadyToPlay = false;
+                break;
+            case LauncherState.Ready:
+                StatusHeadline = "Portal estabilizado. Listo para entrar.";
+                StatusDetail = "Todo actualizado. Buen viaje, aventurero.";
+                IsReadyToPlay = true;
+                break;
+            case LauncherState.Error:
+                StatusDetail = string.IsNullOrWhiteSpace(detail) ? "Se produjo un error durante la actualización." : detail;
+                IsReadyToPlay = false;
+                break;
+        }
+    }
+
+    private string GetRandomFlavorText()
+    {
+        if (FlavorTexts.Length == 0)
+            return "Estabilizando el Zaap…";
+
+        string selected;
+        do
+        {
+            selected = FlavorTexts[_random.Next(FlavorTexts.Length)];
+        }
+        while (FlavorTexts.Length > 1 && string.Equals(selected, _lastFlavorText, StringComparison.Ordinal));
+
+        _lastFlavorText = selected;
+        return selected;
     }
 
     private void SetPatchProgressTarget(double value)
