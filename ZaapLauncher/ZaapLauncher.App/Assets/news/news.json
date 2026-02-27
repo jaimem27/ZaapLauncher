@@ -4,18 +4,19 @@
       "id": "2026-02-19-launch",
       "date": "2026-02-19",
       "title": "ZaapLauncher online",
-      "tag": "Update",
-      "body": "Nuevo launcher con portal animado, noticias y mejoras de estabilidad.",
+      "tag": "Release",
+      "body": "Nuevo launcher con noticias y mejoras de estabilidad para tu servidor privado de Dofus.",
       "image": "/Assets/news/images/launch.jpg",
-      "link": "https://fonts.google.com/?preview.text=ZaapLauncher"
+      "link": "https://github.com/jaimem27/ZaapLauncher"
     },
     {
-      "id": "2026-02-21-x2exp",
+      "id": "2026-02-21-comunity",
       "date": "2026-02-21",
-      "title": "Fin de semana x2 EXP",
-      "tag": "Evento",
-      "body": "Del viernes al domingo, EXP duplicada en todas las zonas.",
-      "image": "/Assets/news/images/x2exp.jpg"
+      "title": "Descubre nuestra comunidad",
+      "tag": "Social",
+      "body": "Entra en la comunidad de DutyFree para desarrolladores de servidores privados de Dofus, comparte tus proyectos, haz preguntas y conecta con otros entusiastas.",
+      "image": "/Assets/news/images/prueba.jpg",
+      "link": "https://discord.gg/8DAhv7tvxt"
     }
   ]
 }

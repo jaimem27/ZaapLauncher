@@ -18,6 +18,7 @@
     <None Remove="Assets\icons\discord.png" />
     <None Remove="Assets\icons\minimize.png" />
     <None Remove="Assets\news\images\launch.jpg" />
+    <None Remove="Assets\news\images\prueba.jpg" />
     <None Remove="Assets\news\images\x2exp.jpg" />
     <None Remove="Assets\news\news.json" />
     <None Remove="Assets\portal.jpg" />
@@ -33,7 +34,7 @@
     <Resource Include="Assets\icons\discord.png" />
     <Resource Include="Assets\icons\minimize.png" />
     <Resource Include="Assets\news\images\launch.jpg" />
-    <Resource Include="Assets\news\images\x2exp.jpg" />
+    <Resource Include="Assets\news\images\prueba.jpg" />
     <Resource Include="Assets\logo.ico" />
     <Content Include="Assets\news\news.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
