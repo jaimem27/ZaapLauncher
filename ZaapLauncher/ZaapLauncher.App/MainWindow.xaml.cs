@@ -112,7 +112,9 @@ namespace ZaapLauncher.App
 
         private void Discord_Click(object sender, RoutedEventArgs e)
         {
-            OpenDiscordCommunity();
+            var url = "https://discord.gg/8DAhv7tvxt"; //Cambiar a tu servidor de Discord
+
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)

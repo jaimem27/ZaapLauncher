@@ -76,6 +76,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly UpdateOrchestrator _updater = new();
     private readonly LauncherService _launcher = new();
     private readonly Random _random = new();
+    private readonly LauncherLogService _logger = new();
 
     private static readonly string[] FlavorTexts =
     [
@@ -135,9 +136,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(ServerStatusText));
         OnPropertyChanged(nameof(ServerStatusColor));
         SetState(LauncherState.Initializing, "Preparando actualización...");
+        await _logger.LogInfoAsync("Updater", $"Inicio de actualización. forceRepair={forceRepair}.");
+
 
         SetPatchProgressTarget(0);
 
+        string? lastProgressEntry = null;
         var progress = new Progress<UpdateProgress>(p =>
         {
             SetPatchProgressTarget(p.Percent);
@@ -151,6 +155,13 @@ public sealed class MainViewModel : INotifyPropertyChanged
             };
 
             SetState(state, p.Detail);
+
+            var progressEntry = $"Etapa={p.Stage}, Progreso={p.Percent:0.##}%, Headline='{p.Headline}', Detail='{p.Detail}'";
+            if (!string.Equals(lastProgressEntry, progressEntry, StringComparison.Ordinal))
+            {
+                lastProgressEntry = progressEntry;
+                _ = _logger.LogInfoAsync("Updater", progressEntry);
+            }
         });
 
         try
@@ -163,6 +174,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             ServerStatusColor = Brushes.MediumSeaGreen;
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
+            await _logger.LogInfoAsync("Updater", "Actualización completada correctamente.");
         }
         catch (OperationCanceledException)
         {
@@ -172,6 +184,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             ServerStatusColor = Brushes.Orange;
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
+            await _logger.LogWarningAsync("Updater", "Actualización cancelada por el usuario.");
         }
         catch (UpdateFlowException ex)
         {
@@ -182,6 +195,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             ServerStatusColor = Brushes.OrangeRed;
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
+            await _logger.LogErrorAsync("Updater", $"Error de actualización: {ex.Headline} - {ex.Detail}", ex);
         }
         catch (Exception ex)
         {
@@ -191,6 +205,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             ServerStatusColor = Brushes.IndianRed;
             OnPropertyChanged(nameof(ServerStatusText));
             OnPropertyChanged(nameof(ServerStatusColor));
+            await _logger.LogErrorAsync("Updater", "Error inesperado durante el flujo de actualización.", ex);
         }
     }
 
@@ -285,11 +300,19 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private void Launch()
     {
         if (File.Exists(Paths.UpdateStatePath))
+        {
+            _ = _logger.LogWarningAsync("Launcher", "Se intentó abrir el juego con una actualización pendiente de recuperar.");
             throw new InvalidOperationException("Hay una actualización pendiente de recuperar. Ejecuta reparar/actualizar antes de jugar.");
+        }
 
         var gameExe = Path.Combine(Paths.InstallDir, "Dofus.exe");
         if (!File.Exists(gameExe))
+        {
+            _ = _logger.LogErrorAsync("Launcher", $"No se encontró ejecutable del juego en: {gameExe}");
             throw new FileNotFoundException("No se encontró el ejecutable del juego.", gameExe);
+        }
+
+        _ = _logger.LogInfoAsync("Launcher", $"Iniciando juego: {gameExe}");
 
         _launcher.Launch(gameExe);
     }
