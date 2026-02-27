@@ -357,8 +357,6 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         try
         {
-            // OJO: idealmente FetchAsync debería recibir la URL (newsUrl),
-            // pero lo dejo como lo tienes ahora.
             var root = await _newsService.FetchAsync(CancellationToken.None);
 
             NewsItems.Clear();

@@ -9,7 +9,7 @@ public readonly record struct ServerStatusSnapshot(string Endpoint, bool IsOnlin
 
 public sealed class ServerStatusService
 {
-    private const string DefaultServerEndpoint = "127.0.0.1:444";
+    private const string DefaultServerEndpoint = "127.0.0.1:444"; // Cambiar por tu IP:puerto por defecto
     private readonly TimeSpan _timeout;
 
     public ServerStatusService(string? endpoint = null, TimeSpan? timeout = null)

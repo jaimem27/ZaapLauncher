@@ -14,7 +14,7 @@ public sealed class NewsService
 {
     private static readonly HttpClient Http = new();
 
-    private const string DefaultManifestUrl = "http://127.0.0.1:8080/manifest.json";
+    private const string DefaultManifestUrl = "http://127.0.0.1:8080/manifest.json"; //Modidicar por tu IP y puerto
 
     public async Task<NewsRoot?> FetchAsync(CancellationToken ct)
     {

@@ -47,7 +47,7 @@
                              AutoReverse="True" />
         </Storyboard>
 
-        <!-- (Opcional) Pulse al volverse READY: NO lo usamos ahora (dejamos glow fijo + micro pulso por scale) -->
+        <!-- Pulse al volverse READY: NO lo usamos ahora (dejamos glow fijo + micro pulso por scale) -->
         <Storyboard x:Key="PlayReadyGlowPro">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.BlurRadius)"
                              To="30"
@@ -286,7 +286,6 @@
                                     Background="#1026C6FF"
                                     Opacity="0">
                                 <Border.Effect>
-                                    <!-- Cambiado a verde suave para CONTRASTE (se nota sobre el portal azul) -->
                                     <DropShadowEffect Color="#7CFFB2"
                                                       BlurRadius="70"
                                                       ShadowDepth="0"
@@ -1338,9 +1337,6 @@
                                         <TextBlock Text="PLAY" />
                                     </Button>
 
-                                    <!-- (resto de UI: barra, % y estados) ... -->
-                                    <!-- Aquí deja tu contenido tal cual (tu barra/progreso/estados) -->
-
                                     <!-- HALO detrás de la barra -->
                                     <Ellipse Canvas.Left="1"
                                              Canvas.Top="353"
@@ -1744,7 +1740,6 @@
             </Border>
         </Grid>
 
-        <!-- Splash (si lo sigues usando) -->
         <Grid x:Name="SplashOverlay"
               Panel.ZIndex="999"
               Background="#05070C"

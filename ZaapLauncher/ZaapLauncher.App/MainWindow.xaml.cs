@@ -182,7 +182,7 @@ namespace ZaapLauncher.App
 
         private static void OpenDiscordCommunity()
         {
-            var url = "https://discord.gg/8DAhv7tvxt";
+            var url = "https://discord.gg/8DAhv7tvxt"; //No cambiar - DutyFree 
 
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
